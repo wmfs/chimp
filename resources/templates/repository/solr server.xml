@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<solrServer>
+  
+  <solr version="3.5" url="http://localhost:8983/solr" connection="chimp"/>
+
+  <capabilities>
+    <capability name="documentRanking" />
+    <capability name="multipleDocumentTypes"/>
+    <capability name="urn" />
+    <capability name="zone" />    
+    <capability name="icon" />
+    <capability name="spatial" />
+    <capability name="synopsis" />
+    <capability name="classification" />
+    <capability name="ctree" />
+    <capability name="language" />
+    <capability name="eventDate" />
+    <capability name="containerDocument" />
+    <capability name="visibility" />
+    <capability name="security" />
+  </capabilities>
+    
+</solrServer>

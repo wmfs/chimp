@@ -1,0 +1,1474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.wmfs.net/chimp" xmlns:tns="http://www.wmfs.net/chimp" elementFormDefault="qualified">
+
+
+
+
+    <element name="specification" type="tns:specificationType"></element>
+    
+
+    <complexType name="specificationType">
+        <annotation>
+        	<documentation></documentation>
+        </annotation>
+        <sequence>
+        	<element name="stageConfig" type="tns:stageConfigType"
+        		maxOccurs="1" minOccurs="0">
+        		<annotation>
+        			<documentation>
+        				Controls how Chimp should store the data
+        				initally extracted from raw files.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="source" type="tns:sourceType" maxOccurs="1"
+        		minOccurs="1">
+        		<annotation>
+        			<documentation>
+        				Describes the data source from which Chimp will
+        				extract the raw data from.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="identification" type="tns:identificationType"
+        		maxOccurs="1" minOccurs="0">
+        		<annotation>
+        			<documentation>
+        				For identifying files as either 'ful' or
+        				'change' by means of regular expressions.
+        				Decided as part of the file scan process, note
+        				that the last line matching either of the
+        				regular expressions will win. Ideally there will
+        				be only one line in the whole file that matches
+        				either of these regular expressions.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="record" type="tns:recordType"
+        		maxOccurs="unbounded" minOccurs="1">
+        		<annotation>
+        			<documentation>
+        				Specifications are made from one or more
+        				records. Different record types can be
+        				identified by regular expressions... this
+        				feature allows for support of 'jagged' .csv
+        				files. Usually records map to a database table,
+        				though it is possible to instruct Chimp that a
+        				record is not 'useful', and that Chimp need not
+        				create database objects to store any data for
+        				it.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="entity" type="tns:entityType"
+        		maxOccurs="unbounded" minOccurs="0">
+        		<annotation>
+        			<documentation>
+        				Various records can be joined together as
+        				'entities' within Chimp. All the necessary
+        				database objects to implement entities as
+        				matrialized views (and keep them fresh) will be
+        				automatically generated. Entities can be subject
+        				to functionality much the same as a record,
+        				including being part of a search domain.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="reference" type="tns:referenceType" maxOccurs="1" minOccurs="0"></element>
+        </sequence>
+        <attribute name="label" type="string">
+    		<annotation>
+    			<documentation>The "pretty" label of the specification, used for documentation and user-facing purposes.</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="vendor" type="string">
+    		<annotation>
+    			<documentation>Details of the company/partner who is supplying the data product.</documentation>
+    		</annotation></attribute>
+    	<attribute name="version" type="string">
+    		<annotation>
+    			<documentation>Version details of the data product that this specification relates.</documentation>
+    		</annotation></attribute>
+    	<attribute name="progressReportFrequency" type="string">
+    		<annotation>
+    			<documentation>When Chimp is processing data then it will report it's progress after a certain amount of records... this value allows control about how frequently this event should occur.
+</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="stageConfigType">
+        <annotation>
+        	<documentation>Controls how Chimp should store the data initally extracted from raw files.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="duplicateRemoval"
+    			type="tns:duplicateRemovalType" maxOccurs="1" minOccurs="0">
+    		</element>
+        </sequence>
+    	<attribute name="dedicatedSchemaName" type="string"></attribute>
+    </complexType>
+
+
+    <complexType name="duplicateRemovalType">
+    	<sequence>
+    		<element name="distinctColumns" type="tns:distinctColumnsType" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="enabled" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="distinctColumnsType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="columnType">
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="sourceType">
+        <annotation>
+        	<documentation>Describes the data source from which Chimp will extract the raw data from.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="csvFormat" type="tns:csvFormatType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="externalLoader" type="tns:externalLoaderType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+        <attribute name="fileWildcard" type="string"></attribute>
+    </complexType>
+
+    <complexType name="csvFormatType">
+    	<sequence></sequence>
+    	<attribute name="delimiter" type="string"></attribute>
+    	<attribute name="qualifier" type="string"></attribute>
+    	<attribute name="dateFormat" type="string"></attribute>
+    	<attribute name="timeFormat" type="string"></attribute>
+    	<attribute name="dateTimeFormat" type="string"></attribute>
+    	<attribute name="qualifiedDates" type="string"></attribute>
+    	<attribute name="qualifiedTimes" type="string"></attribute>
+    	<attribute name="qualifiedDateTimes" type="string"></attribute>
+    	<attribute name="startAtLine" type="string"></attribute>
+    	<attribute name="encoding" type="string"></attribute>
+    </complexType>
+
+    <complexType name="externalLoaderType">
+    	<sequence>
+    		<element name="supplementalVariables" type="tns:supplementalVariablesType" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="profile" type="string"></attribute>
+    </complexType>
+
+    <complexType name="supplementalVariablesType">
+    	<sequence>
+    		<element name="variable" type="tns:variableType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="variableType">
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="identificationType">
+        <annotation>
+        	<documentation>For identifying files as either "full" or "change" by means of regular expressions.
+Decided as part of the file scan process, note that the last line matching either of the regular expressions will win.
+Ideally there will be only one line in the whole file that matches either of these regular expressions.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="fullRegex" type="string" maxOccurs="1" minOccurs="1"></element>
+    		<element name="changeRegex" type="string" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="recordType">
+    	<annotation>
+    		<documentation>
+    			Specifications are made from one or more records.
+    			Different record types can be identified by regular
+    			expressions... this feature allows for support of
+    			"jagged" .csv files. Usually records map to a database
+    			table, though it is possible to instruct Chimp that a
+    			record is not "useful", and that Chimp need not create
+    			database objects to store any data for it.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="identification"
+    			type="tns:recordIdentificationType" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    		<element name="suppliedFields" type="tns:suppliedFieldsType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    		<element name="additionalFields"
+    			type="tns:additionalFieldsType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="validation" type="tns:validationType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="computedData" type="tns:computedDataType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="area" type="tns:areaType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="primaryKey" type="tns:primaryKeyType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="additionalIndexes"
+    			type="tns:additionalIndexesType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="additionalStageIndexes"
+    			type="tns:additionalStageIndexesType" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    		<element name="triggeredActions"
+    			type="tns:triggeredActionsType" maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="nativeTable" type="string"></attribute>
+    	<attribute name="table" type="string"></attribute>
+    	<attribute name="withOids" type="boolean"></attribute>
+    	<attribute name="useful" type="boolean"></attribute>
+    	<attribute name="editable" type="boolean"></attribute>
+    	<attribute name="defaultVisibility" type="int"></attribute>
+    	<attribute name="defaultSecurity" type="int"></attribute>
+    	<attribute name="fillFactor" type="int"></attribute>
+    </complexType>
+
+    <complexType name="entityType">
+    	<annotation>
+    		<documentation>
+    			Various records can be joined together to form
+    			"entities" within Chimp. All the necessary database
+    			objects to implement entities as matrialized views (and
+    			keep them fresh) will be automatically generated.
+    			Entities can be subject to functionality much the same
+    			as a record, including being part of a search domain.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="tables" type="tns:entityTablesType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    		<element name="additionalIndexes"
+    			type="tns:entityAdditionalIndexesType" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    		<element name="computedData" type="tns:computedDataType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="defaultVisibility" type="int"></attribute>
+    	<attribute name="defaultSecurity" type="int"></attribute>
+    	<attribute name="whereClause" type="string"></attribute>
+    	<attribute name="fillFactor" type="int"></attribute>
+    </complexType>
+
+    <complexType name="recordIdentificationType">
+        <annotation>
+        	<documentation>Of use when working with .csv files...
+Here you can define how Chimp can distinguish a record of this given typefrom any other (by means of a regular expression).
+When working with "change only updates" it is also possible to provide regular expressions to detect the intended action of a record (i.e. insert, update or delete).
+</documentation>
+        </annotation>
+        <sequence>
+        	<element name="recordRegex" type="string" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        	<element name="insertRegex" type="string" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        	<element name="mergeRegex" type="string" maxOccurs="1" minOccurs="0"></element>
+        	<element name="updateRegex" type="string" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        	<element name="deleteRegex" type="string" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        </sequence>
+        <attribute name="defaultAction" type="string"></attribute>
+    </complexType>
+
+    <complexType name="primaryKeyType">
+        <annotation>
+        	<documentation>Identifies which columns (which should all have corresponding "fields") uniquely identify a record.
+Chimp will generate a primary key constraint to enforce this integrity.
+Chimp supports concatenated primary keys (i.e. multiple columns can be defined here) and records with no primary key (though data products that lack a primary key are discouraged as Chimp will not be able to offer its whole range of features).</documentation>
+        </annotation>
+        <sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="ctreeType">
+    	<attribute name="ancestorColumn" type="string"></attribute>
+    	<attribute name="descendantColumn" type="string"></attribute>
+    	<attribute name="columnSuffix" type="string"></attribute>
+    </complexType>
+
+    <complexType name="suppliedFieldsType">
+        <annotation>
+        	<documentation>A record is made up of one or more "fields".
+Here, fields are the supplied values (as defined by the supplier of the data product), and should be described in the order they appear in the raw data.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="field" type="tns:fieldType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="fieldType">
+    	<sequence></sequence>
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="redirectedFromColumn" type="string"></attribute>
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="text"></enumeration>
+    				<enumeration value="number"></enumeration>
+    				<enumeration value="date"></enumeration>
+    				<enumeration value="time"></enumeration>
+    				<enumeration value="datetime"></enumeration>
+    				<enumeration value="geometry"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="array" type="boolean"></attribute>
+    	<attribute name="mandatory" type="boolean"></attribute>
+    	<attribute name="size" type="int"></attribute>
+    	<attribute name="decimalPlaces" type="int"></attribute>
+    	<attribute name="default" type="string"></attribute>
+    </complexType>
+
+    <complexType name="additionalFieldsType">
+        <annotation>
+        	<documentation>Chimp allows any data product to be extended by allowing additional fields to be defined.
+Note that there is no need to alter any data product that you are being suplied with... Chimp will still expect the raw data to be supplied with only "supplied fields".
+</documentation>
+        </annotation>
+        <sequence>
+    		<element name="field" type="tns:fieldType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="additionalIndexesType">
+    	<sequence>
+    		<element name="index" type="tns:indexType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="indexType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="using" type="string"></attribute>
+    </complexType>
+
+    <complexType name="pinheadType">
+    	<sequence>
+    		<element name="pin" type="tns:pinType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="searchType">
+        <annotation>
+        	<documentation>Describes how a record or entity should be absorbed into a Chimp "search domain".</documentation>
+        </annotation>
+        <sequence>
+    		<element name="contributingFields"
+    			type="tns:searchContributingFields" maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="defaultContentAssemblers" type="tns:defaultContentAssemblersType" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="domain" type="string"></attribute>
+    	<attribute name="ranking" type="int"></attribute>
+    </complexType>
+
+    <complexType name="triggeredActionsType">
+    	<sequence>
+    		<element name="setMvModified" type="tns:setMvModifiedType" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+
+    <complexType name="optionType">
+    	<sequence>
+    		<element name="additional" type="tns:additionalType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="value" type="string"></attribute>
+    	<attribute name="label" type="string"></attribute>
+    </complexType>
+
+    <complexType name="additionalStageIndexesType">
+    	<sequence>
+    		<element name="index" type="tns:indexType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="labellerType">
+    	<sequence>
+    		<element name="searchLabeller"
+    			type="tns:searchLabellerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="searchLabellerType">
+    	<sequence></sequence>
+    	<attribute name="domain" type="string"></attribute>
+    	<attribute name="linkType" type="string"></attribute>
+        <attribute name="table" type="string"></attribute>
+    </complexType>
+
+    <complexType name="additionalAttributesType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="iconsType">
+    	<sequence>
+    		<element name="iconGenerator" type="tns:iconGeneratorType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="iconGeneratorType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="simpleMapping" type="tns:SimpleMappingType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="fixedFilename" type="string"></attribute>
+    </complexType>
+
+    <complexType name="contributingFieldsType">
+    	<sequence>
+    		<element name="field" type="tns:contributingFieldType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="SimpleMappingType">
+    	<sequence>
+    		<element name="mapping" type="tns:mappingType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="sourceColumn" type="string"></attribute>
+    	<attribute name="unmappedFilename" type="string"></attribute>
+    	<attribute name="unmappedPriority" type="string"></attribute>
+    </complexType>
+
+    <complexType name="contributingFieldType">
+    	<sequence>
+    	</sequence>
+    	<attribute name="column" type="string"></attribute>
+    </complexType>
+
+    <complexType name="mappingType">
+    	<sequence></sequence>
+    	<attribute name="inputValue" type="string"></attribute>
+    	<attribute name="outputValue" type="string"></attribute>
+    </complexType>
+
+    <complexType name="searchContributingFields">
+    	<sequence>
+    		<element name="field" type="tns:searchField" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="searchField">
+    	<attribute name="column" type="string"></attribute>
+    </complexType>
+
+    <complexType name="defaultContentAssemblersType">
+    	<sequence>
+    		<element name="urnAssembler" type="tns:urnAssemblerType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="iconAssembler"
+    			type="tns:iconAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="labelAssembler"
+    			type="tns:labelAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="searchAssembler"
+    			type="tns:searchAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="filterAssembler"
+    			type="tns:filterAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="coordinatesAssembler"
+    			type="tns:coordinatesAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="synopsisAssembler"
+    			type="tns:synopsisAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="resultScriptAssembler"
+    			type="tns:resultScriptAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="positionalAccuracyAssembler"
+    			type="tns:positionalAccuracyAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="labelRankingAssembler"
+    			type="tns:labelRankingAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="classificationAssembler"
+    			type="tns:classificationAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="ctreeAssembler" type="tns:ctreeAssemblerType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="urnAssemblerType">
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="urnLabelPrefix" type="string"></attribute>
+    </complexType>
+
+    <complexType name="iconAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="fixedIconName" type="string"></attribute>
+    	<attribute name="pinheadIconGeneratorName" type="string"></attribute>
+    </complexType>
+
+    <complexType name="labelAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    </complexType>
+
+    <complexType name="searchAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="filterAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="fixed" type="string"></attribute>
+    </complexType>
+
+    <complexType name="coordinatesAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingCoordinateFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="synopsisAssemblerType">
+    	<sequence>
+    		<element name="contributingFields"
+    			type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    </complexType>
+
+    <complexType name="resultScriptAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    </complexType>
+
+    <complexType name="positionalAccuracyAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="fixed" type="string"></attribute>
+    </complexType>
+
+    <complexType name="labelRankingAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="fixed" type="string"></attribute>
+    </complexType>
+
+    <complexType name="classificationAssemblerType">
+    	<sequence>
+    		<element name="contributingFields" type="tns:contributingFieldsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    </complexType>
+
+    <complexType name="ctreeAssemblerType">
+    	<attribute name="table" type="string"></attribute>
+    	<attribute name="ancestorColumn" type="string"></attribute>
+    	<attribute name="descendantColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="contributingCoordinateFieldsType">
+    	<sequence>
+    		<element name="coordinatePair" type="tns:coordinatePairType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="coordinatePairType">
+    	<attribute name="xColumn" type="string"></attribute>
+    	<attribute name="yColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="entityTablesType">
+        <annotation>
+        	<documentation>Contains the various database tables that when joined together will form the entity.
+Note that tables that contribute to an entity must also have an associated "record" defined within the specification.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="table" type="tns:entityTableType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	
+    </complexType>
+
+
+    <complexType name="pinType">
+    	<sequence>
+    		<element name="labeller" type="tns:labellerType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="additionalAttributes" type="tns:additionalAttributesType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="icons" type="tns:iconsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="xColumn" type="string"></attribute>
+    	<attribute name="yColumn" type="string"></attribute>
+    	<attribute name="title" type="string"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    	<attribute name="defaultIcon" type="string"></attribute>
+    	<attribute name="defaultIconColumn" type="string"></attribute>
+    	<attribute name="urnColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="setMvModifiedType">
+    	<sequence>
+    		<element name="joins" type="tns:setMvModifiedJoinsType"></element>
+    	</sequence>
+    	<attribute name="targetTable" type="string"></attribute>
+    	<attribute name="entityName" type="string"></attribute>
+    </complexType>
+
+    <complexType name="setMvModifiedJoinType">
+    	<attribute name="localColumn" type="string"></attribute>
+    	<attribute name="targetColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="setMvModifiedJoinsType">
+    	<sequence>
+    		<element name="join" type="tns:setMvModifiedJoinType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="entityPrimaryKeyType">
+        <annotation>
+        	<documentation>Defines the primary key for the entity.
+Note that tables and columns that combine to create an entity can be aliased.
+In situations where column names are common across multiple tables, aliases should be used.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="entityTableType">
+        <annotation>
+        	<documentation>Defines a table that contributes to an entity.
+It is recommended that all tables have an alias defined for them.</documentation>
+        </annotation>
+        <sequence>
+        	<element name="columns" type="tns:entityColumnsType"
+        		maxOccurs="unbounded" minOccurs="1">
+        	</element>
+        	<element name="join" type="tns:joinType" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        	<element name="additionalTriggeringColumns"
+        		type="tns:additionalTriggeringColumnsType" maxOccurs="1"
+        		minOccurs="0">
+        	</element>
+        </sequence>
+        <attribute name="name" type="string"></attribute>
+    	<attribute name="alias" type="string"></attribute>
+    </complexType>
+
+    <complexType name="entityColumnsType">
+        <annotation>
+        	<documentation>Contains the columns from the table that are to be explicitly present in the entity.
+Note Chimp will automatically include id columns (referring to aliases if necessary).
+
+Considering all the tables that contribute to an entity...
+The GREATEST of alll created/modified columns will be generated.
+LEAST visablity and GREATEST security values will also be generated automatically.
+</documentation>
+        </annotation>
+        <sequence>
+    		<element name="column" type="tns:entityColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="entityAdditionalIndexesType">
+        <annotation>
+        	<documentation>Indexes will be created to support primary key access and various aggregated columns (created, modfified, visibility, security)... however it is also possible to highlight other columns that would benefit from dedicated indexing.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="index" type="tns:indexType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+
+    <complexType name="entityColumnType">
+        <annotation>
+        	<documentation>The column (along with an alias if necessary... i.e. the same column appears in another contributing table) that should feature in the entity.</documentation>
+        </annotation>
+        <attribute name="name" type="string"></attribute>
+    	<attribute name="alias" type="string"></attribute>
+    </complexType>
+
+    <complexType name="joinType">
+    	<sequence>
+    		<element name="joiningColumns" type="tns:joiningColumnsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="joinType">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="inner"></enumeration>
+    				<enumeration value="left"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="filter" type="string"></attribute>
+    </complexType>
+
+    <complexType name="joinConditionsType">
+    	<sequence>
+    		<element name="joinCondition" type="tns:joinConditionType"></element>
+    	</sequence>
+    	
+    </complexType>
+
+    <complexType name="joinConditionType">
+    	<attribute name="condition" type="string"></attribute>
+    	<attribute name="filter" type="string"></attribute>
+    </complexType>
+
+
+    <complexType name="additionalTriggeringColumnsType">
+    	<sequence maxOccurs="unbounded" minOccurs="1">
+    		<element name="column" type="tns:entityColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="leadTableRefreshTriggeringColumnsType">
+    	<sequence>
+    		<element name="column" type="tns:entityColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+
+
+
+    <complexType name="joiningColumnsType">
+    	<sequence>
+    		<element name="columnPair" type="tns:columnPairType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="columnPairType">
+        <attribute name="column" type="string"></attribute>
+        <attribute name="foreignTable" type="string"></attribute>
+        <attribute name="foreignColumn" type="string"></attribute>
+    </complexType>
+
+
+    <complexType name="computedFieldType">
+    	<sequence>
+    		<element name="source" type="string"></element>
+    	</sequence>
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="text"></enumeration>
+    				<enumeration value="number"></enumeration>
+    				<enumeration value="date"></enumeration>
+    				<enumeration value="time"></enumeration>
+    				<enumeration value="datetime"></enumeration>
+    				<enumeration value="geometry"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="size" type="int"></attribute>
+    	<attribute name="decimalPlaces" type="int"></attribute>
+    	<attribute name="defaultValue" type="string"></attribute>
+    </complexType>
+
+    
+    <complexType name="triggeringColumnsType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+
+    <complexType name="computedDataType">
+    	<sequence>
+    		<element name="computedDataElement"
+    			type="tns:computedDataElementType" maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="customColumnType">
+    	<sequence>
+            <element name="triggeringColumns" type="tns:triggeringColumnsType" maxOccurs="1" minOccurs="0"></element>
+            <element name="templateAssembler"
+    			type="tns:templateAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="outputColumn" type="string"></attribute>
+        <attribute name="label" type="string"></attribute>
+        <attribute name="type">
+        	<simpleType>
+        		<restriction base="string">
+        			<enumeration value="text"></enumeration>
+        			<enumeration value="number"></enumeration>
+        			<enumeration value="date"></enumeration>
+        			<enumeration value="time"></enumeration>
+        			<enumeration value="datetime"></enumeration>
+        			<enumeration value="geometry"></enumeration>
+        		</restriction>
+        	</simpleType>
+        </attribute>
+        <attribute name="size" type="string"></attribute>
+    	<attribute name="decimalPlaces" type="string"></attribute>
+    </complexType>
+
+    <complexType name="mappedColumnType">
+    	<sequence></sequence>
+    	<attribute name="outputColumn" type="string"></attribute>
+    	<attribute name="type" type="string"></attribute>
+    	<attribute name="size" type="string"></attribute>
+    	<attribute name="decimalPlaces" type="string"></attribute>
+    	<attribute name="valueIfUnmapped" type="string"></attribute>
+    	<attribute name="inputColumn" type="string"></attribute>
+    	<attribute name="optionSetName" type="string"></attribute>
+    	<attribute name="optionSetColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="timestampColumnType">
+    	<sequence>
+    		<element name="triggeringColumns" type="tns:triggeringColumnsType" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="outputColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="zoneColumnType">
+    	<attribute name="outputColumn" type="string"></attribute>
+    	<attribute name="xColumn" type="string"></attribute>
+    	<attribute name="yColumn" type="string"></attribute>
+    </complexType>
+
+    <complexType name="cTree">
+    	<attribute name="inputAncestorColumn" type="string"></attribute>
+    	<attribute name="inputDescendantColumn" type="string"></attribute>
+    	<attribute name="columnSuffix" type="string"></attribute>
+    	<attribute name="outputDepthColumn" type="string"></attribute>
+    	<attribute name="outputImmediateAncestorColumn" type="string"></attribute>
+    	<attribute name="outputRootAncestorColumn" type="string"></attribute>
+    	<attribute name="outputDescendantCountColumn" type="string"></attribute>
+    </complexType>
+
+
+    <complexType name="pinType1">
+    	<sequence>
+    		<element name="computedData" type="tns:computedPinData"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="additionalIndexes"
+    			type="tns:additionalIndexesType" maxOccurs="unbounded"
+    			minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="keyColumn" type="string"></attribute>
+    	<attribute name="documentType" type="string"></attribute>
+    	<attribute name="vicinityResultIconColumn" type="string"></attribute>
+    	<attribute name="vicinityResultIconConstant" type="string"></attribute>
+    	<attribute name="idColumn" type="string"></attribute>
+    	<attribute name="vicinityResultLabelColumn" type="string"></attribute>
+    	<attribute name="title" type="string"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    	<attribute name="xColumn" type="string"></attribute>
+    	<attribute name="yColumn" type="string"></attribute>
+    	<attribute name="whereClause" type="string"></attribute>
+    	<attribute name="minimumVisibility" type="int"></attribute>
+    	<attribute name="maximumSecurity" type="int"></attribute>
+    </complexType>
+
+    <complexType name="searchEntryType">
+    	<sequence>
+    		<element name="capabilityMappings"
+    			type="tns:capabilityMappingsType" maxOccurs="1" minOccurs="1">
+    		</element>
+            <element name="triggeringColumns" type="tns:triggeringColumnsType" maxOccurs="1" minOccurs="1"></element>
+        </sequence>
+    	<attribute name="domain" type="string"></attribute>
+    	<attribute name="ranking" type="int"></attribute>
+    </complexType>
+
+    <complexType name="additionalColumnsType">
+    	<sequence>
+    		<element name="customColumn" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="templateType">
+    	<sequence>
+    		<element name="stringConstructor" type="tns:stringConstructorType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="stringConstructorType">
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    </complexType>
+
+    <complexType name="computedDataElementType">
+    	<sequence>
+    		<element name="customColumn" type="tns:customColumnType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="mappedColumn" type="tns:mappedColumnType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="timestampColumn"
+    			type="tns:timestampColumnType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="zoneColumn" type="tns:zoneColumnType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="ctree" type="tns:cTree" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    		<element name="pin" type="tns:pinType1" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    		<element name="searchEntry" type="tns:searchEntryType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="solrDocument" type="tns:solrDocumentType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="timestampColumn"></complexType>
+
+    <complexType name="assembler"></complexType>
+
+    <complexType name="templateAssemblerType">
+    	<sequence>
+    		<element name="content" type="tns:content" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="header" type="string"></attribute>
+    	<attribute name="footer" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    	<attribute name="format" type="string"></attribute>
+    </complexType>
+
+    <complexType name="capabilityMappingsType">
+    	<sequence>
+    		<element name="capabilityMapping" type="tns:capabilityMapping" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	
+    </complexType>
+
+    <complexType name="capabilityMapping">
+    	<sequence>
+            <element name="capabilities" type="tns:capabilitiesType" maxOccurs="1" minOccurs="1"></element>
+            <element name="contentTemplateAssembler"
+    			type="tns:templateAssemblerType" maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="capabilitiesType">
+    	<sequence>
+    		<element name="capability" type="tns:capabilityType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="capabilityType">
+    	<sequence></sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="content">
+    	<sequence>
+    		<element name="contentElement" type="tns:contentElementType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="contentElementType">
+    	<attribute name="prefix" type="string"></attribute>
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="suffix" type="string"></attribute>
+    </complexType>
+
+    <complexType name="additionalContentType">
+    	<sequence>
+    		<element name="customColumn" type="tns:customColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="computedPinData">
+    	<sequence>
+    		<element name="computedDataElement" type="tns:computedPinElementType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="computedPinElementType">
+    	<sequence>
+    		<element name="customColumn" type="tns:customColumnType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="mappedColumn" type="tns:mappedColumnType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="referenceType">
+    	<sequence>
+    		<element name="optionSet" type="tns:optionSetType" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="optionSetType">
+    	<sequence>
+            <element name="additionalAttributes" type="tns:additionalOptionAttributes" maxOccurs="1" minOccurs="0"></element>
+            <element name="options" type="tns:optionsType" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="text"></enumeration>
+    				<enumeration value="number"></enumeration>
+    				<enumeration value="boolean"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="size" type="int"></attribute>
+    	<attribute name="decimalPlaces" type="int"></attribute>
+    </complexType>
+
+    <complexType name="optionsType">
+    	<sequence>
+    		<element name="option" type="tns:optionType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="validationType">
+    	<sequence>
+    		<element name="check" type="tns:checkType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="checkType">
+    	<sequence>
+    		<element name="MessageColumnMapping"
+    			type="tns:MessageColumnMappingType">
+    		</element>
+    	</sequence>
+    	<attribute name="messageCode" type="string"></attribute>
+    	<attribute name="message" type="string"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    	<attribute name="checkType">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="custom"></enumeration>
+    				<enumeration value="mustBeHistoric"></enumeration>
+    				<enumeration value="mustBeFuturistic"></enumeration>
+    				<enumeration value="regex"></enumeration>
+    				<enumeration value="inOptionSet"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="expression" type="string"></attribute>
+    	<attribute name="optionSetName" type="string"></attribute>
+    </complexType>
+
+    <complexType name="MessageColumnMappingType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="inputColumnsType">
+    	<sequence>
+    		<element name="column" type="tns:columnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+
+    <complexType name="additionalOptionAttributes">
+    	<sequence>
+    		<element name="attribute" type="tns:attributeType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="attributeType">
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="text"></enumeration>
+    				<enumeration value="number"></enumeration>
+    				<enumeration value="boolean"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="size" type="string"></attribute>
+    	<attribute name="decimalPlaces" type="int"></attribute>
+    </complexType>
+
+    <complexType name="additionalType">
+    	<sequence>
+    		<element name="attrib" type="tns:attribType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="attribType">
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    
+    <complexType name="solrProfile">
+    	<sequence>
+    		<element name="capabilities" type="tns:solrCapabilities2"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+    
+
+    <complexType name="solrCapabilities2">
+    	<sequence>
+    		<element name="capability" type="tns:solrCapabilityType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="solrCapabilityType">
+    	<attribute name="name">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="zone"></enumeration>
+    				<enumeration value="key"></enumeration>
+    				<enumeration value="icon"></enumeration>
+    				<enumeration value="coordinates"></enumeration>
+    				<enumeration value="synopsis"></enumeration>
+    				<enumeration value="classification"></enumeration>
+    				<enumeration value="ctree"></enumeration>
+    				<enumeration value="language"></enumeration>
+    				<enumeration value="eventDate"></enumeration>
+    				<enumeration value="containerDocument"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    </complexType>
+
+    <complexType name="solrDocumentType">
+    	<sequence>
+    		<element name="documentContent" type="tns:documentContentType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="documentName" type="string"></attribute>
+    	<attribute name="solrServerName" type="string"></attribute>
+    </complexType>
+
+    <complexType name="documentContentType">
+    	<sequence>
+    		<element name="capabilityInputs" type="tns:capabilityInputsType" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    	
+    </complexType>
+    
+    <complexType name="mappingType1">
+    	<sequence>
+    		<element name="inputFields" type="tns:inputFieldsType"></element>
+    	</sequence>
+    	<attribute name="capability" type="string"></attribute>
+    </complexType>
+
+    <complexType name="fieldsType"></complexType>
+
+    <complexType name="inputFieldsType"></complexType>
+
+    <complexType name="capabilityType1"></complexType>
+
+    <complexType name="capabilityInputsType">
+    	<sequence>
+    		<element name="input" type="tns:inputField"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="capability" type="string"></attribute>
+    	<attribute name="delimiter" type="string"></attribute>
+    	<attribute name="format" type="string"></attribute>
+    	<attribute name="functions" type="string"></attribute>
+    </complexType>
+
+    <complexType name="capabilityInputFieldsType">
+    	<sequence>
+    		<element name="inputField" type="tns:inputField" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="inputField">
+    	<sequence>
+    		<element name="formatting" type="tns:formattingType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="column" type="string"></attribute>
+    	<attribute name="optionSetName" type="string"></attribute>
+    	<attribute name="optionSetColumn" type="string"></attribute>
+    	<attribute name="constant" type="string"></attribute>
+    </complexType>
+
+    <complexType name="formattingType">
+    	<sequence>
+    		<element name="function" type="tns:functionType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    		<element name="method" type="tns:methodType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="functionType">
+    	<sequence></sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="methodType">
+    	<sequence></sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="areaType">
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="geometryColumn" type="string"></attribute>
+    	<attribute name="idColumn" type="string"></attribute>
+    	<attribute name="labelColumn" type="string"></attribute>
+    </complexType>
+
+    
+
+    <element name="extract" type="tns:extractType"></element>
+    
+
+    <complexType name="extractType">
+    	<sequence>
+    		<element name="constants" type="tns:constantsType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="csvExtractor" type="tns:csvExtractorType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="constantsType">
+    	<sequence>
+    		<element name="constant" type="tns:constantType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="constantType">
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="csvExtractorType">
+    	<sequence>
+    		<element name="destination" type="tns:destinationType"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="formatting" type="tns:extractFormattingType"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+            <element name="sections" type="tns:sectionsType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="destinationType">
+    	<sequence>
+    		<element name="filename" type="tns:filenameType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    	<attribute name="encoding" type="string"></attribute>
+    	<attribute name="defaultTargetDirectory" type="string"></attribute>
+    </complexType>
+
+    <complexType name="extractFormattingType">
+    	<sequence></sequence>
+    	<attribute name="delimiter" type="string"></attribute>
+    	<attribute name="qualifier" type="string"></attribute>
+    	<attribute name="dateFormat" type="string"></attribute>
+    	<attribute name="timeFormat" type="string"></attribute>
+    	<attribute name="dateTimeFormat" type="string"></attribute>
+    	<attribute name="dateTime" type="string"></attribute>
+    	<attribute name="qualifiedDates" type="boolean"></attribute>
+    	<attribute name="qualifiedTimes" type="boolean"></attribute>
+    	<attribute name="qualifiedDateTimes" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="sectionType">
+    	<sequence>
+    		<element name="source" type="tns:extractSource" maxOccurs="1" minOccurs="0"></element>
+    		<element name="line" type="tns:extractLineType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="filenameType">
+    	<sequence>
+    		<element name="input" type="tns:extratcFilenameInputType"></element>
+    	</sequence>
+    	<attribute name="format" type="string"></attribute>
+    </complexType>
+
+    <complexType name="extratcFilenameInputType">
+    	<attribute name="variable" type="string"></attribute>
+    </complexType>
+
+    <complexType name="sectionsType">
+    	<sequence>
+    		<element name="section" type="tns:sectionType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="extractLineType">
+    	<sequence>
+    		<element name="outputFields" type="tns:outputFieldsType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="outputFieldsType">
+    	<sequence>
+    		<element name="outputField" type="tns:outputFieldType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="outputFieldType">
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="sourceType">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="constant"></enumeration>
+    				<enumeration value="variable"></enumeration>
+    				<enumeration value="column"></enumeration>
+    				<enumeration value="mappedColumn"></enumeration>
+    				<enumeration value="custom"></enumeration>
+    				<enumeration value="null"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="sourceValue" type="string"></attribute>
+    	<attribute name="outputType">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="text"></enumeration>
+    				<enumeration value="number"></enumeration>
+    				<enumeration value="date"></enumeration>
+    				<enumeration value="time"></enumeration>
+    				<enumeration value="datetime"></enumeration>
+    				<enumeration value="geometry"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="outputDecimalPlaces" type="int"></attribute>
+    	<attribute name="optionSetName" type="string"></attribute>
+    	<attribute name="optionSetColumn" type="string"></attribute>
+    	<attribute name="size" type="int"></attribute>
+    	<attribute name="valueIfUnmapped" type="string"></attribute>
+    </complexType>
+
+    <complexType name="extractSource">
+    	<sequence>
+    		<element name="fullPrimaryKeys" type="tns:fullPrimaryKeysType" maxOccurs="1" minOccurs="0"></element>
+            <element name="changePrimaryKeys" type="tns:changePrimaryKeysType" maxOccurs="1" minOccurs="0"></element>
+            <element name="deletePrimaryKeys" type="tns:deletePrimaryKeysType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="fullPrimaryKeysType">
+    	<sequence>
+    		<element name="table" type="tns:extractTableType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="changePrimaryKeysType">
+    	<sequence>
+    		<element name="table" type="tns:extractTableType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="deletePrimaryKeysType">
+    	<sequence>
+    		<element name="table" type="tns:extractTableType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="extractTableType">
+    	<sequence>
+    		<element name="masterTable" type="tns:masterTableType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="key" type="tns:keyType" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    	</sequence>
+    	<attribute name="schema" type="string"></attribute>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="timestampColumn" type="string"></attribute>
+    	<attribute name="alias" type="string"></attribute>
+    </complexType>
+
+    <complexType name="keyType">
+    	<sequence>
+    		<element name="column" type="tns:extractPkColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="extractPkColumnType">
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="masterTableType">
+    	<sequence>
+    		<element name="join" type="tns:joinType1" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="schema" type="string"></attribute>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="joinType1">
+    	<attribute name="masterTableColumn" type="string"></attribute>
+    	<attribute name="column" type="string"></attribute>
+    </complexType>
+</schema>

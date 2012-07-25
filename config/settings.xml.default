@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<settings>
+
+  <registry>
+    <key name="repositoryPath" value="D:/pythonprojects/chimp.repository" />
+    <key name="srid" value="27700" />
+    <key name="checkConstraintSetSizeThreshold" value="10" />
+    <key name="loggingLevel" value="debug" />
+    <key name="logPath" value="./logs" />
+    <key name="tempPath" value="./temp" />
+    <key name="logMaxBytes" value="10000000" />
+    <key name="logBackupCount" value="10" />
+    <key name="logFormat" value="%(asctime)s - %(levelname)s - %(message)s" />
+    <key name="otherLogPath" value="/gisfiles/Chimp/logs" />
+    <key name="pinheadProgressReportFrequency" value="1000" />
+    <key name="pinheadIndexRebuildThreshold" value="100000" />
+    <key name="searchProgressReportFrequency" value="1000" />
+    <key name="searchIndexRebuildThreshold" value="100000" />
+    <key name="dataCommitThreshold" value="1000000" />
+    <key name="buildDialect" value="default" />
+    <key name="psqlExecutable" value="C:\Program Files\PostgreSQL\9.0\bin\psql.exe"/>
+    <key name="defaultZoneId" value="3" />
+  </registry>
+  
+  <visibilityLevels>
+    <level name="deleted" value="10"/>
+  </visibilityLevels>
+  
+  <securityLevels>
+    <level name="unsecured" value="10"/>
+    <level name="low" value="25"/>
+    <level name="medium"  value="50"/>
+    <level name="high" value="75"/>
+  </securityLevels>
+
+  <zones>
+	<zone id="2" schema="areas" table="wmfs_boundary_10k_buffer" column="wkb_geometry"/>
+	<zone id="1" schema="areas" table="wmfs_boundary" column="wkb_geometry"/>
+  </zones>
+		  
+</settings>

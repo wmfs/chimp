@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<solrSettings>
+
+  <registry>
+    <key name="dateTimeFormat" value="1995-12-31T23:59:59Z" />
+    <key name="srid" value="4326" />
+    <key name="defaultVersion" value="3.6" />
+    <key name="dataSource" value="JdbcDataSource"/>
+    <key name="databaseDriver" value="org.postgresql.Driver"/>
+    <key name="databaseUrlPrefix" value="jdbc:postgresql:"/>
+    
+  </registry>
+      
+</solrSettings>  

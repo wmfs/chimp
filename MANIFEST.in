@@ -1,0 +1,2 @@
+recursive-include config *
+include LICENSE.txt

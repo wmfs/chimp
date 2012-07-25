@@ -1,0 +1,329 @@
+<solrFields>
+
+  <fieldConfig>
+
+    <field name="document_id" 
+    	solrType="string"
+    	stored="true" 
+    	indexed="true" 
+    	required="true"
+    	chimpType="text"
+    	size="30"
+    	mandatory="true"
+    	variable="documentId"/>
+
+    <field name="label" 
+    	capability="label"
+    	solrType="string" 
+    	stored="true" 
+    	indexed="false"
+    	chimpType="text"
+    	size="200"
+    	mandatory="false"
+    	variable="label"/>
+
+    <field name="search_text" 
+    	capability="searchText"
+    	solrType="text_general" 
+    	stored="false"
+    	indexed="true"
+    	chimpType="text"
+    	size="4000"
+    	mandatory="false"
+    	variable="searchable"/>
+
+    <field name="document_key"
+    	capability="documentKey" 
+    	solrType="string" 
+    	stored="true" 
+    	indexed="true"
+    	chimpType="text"
+    	size="100"
+    	mandatory="true"
+    	variable="documentKey"/>
+
+    <field name="ranking" 
+    	capability="documentRanking" 
+    	solrType="int" 
+    	stored="false" 
+    	indexed="true"
+    	chimpType="number"
+    	size="4"
+    	mandatory="false"
+    	variable="ranking"/>
+
+    <field name="document_type" 
+    	capability="multipleDocumentTypes" 
+    	solrType="string" 
+    	stored="true" 
+    	indexed="true"
+    	chimpType="text"
+    	size="30"
+    	mandatory="true"
+    	variable="documentType"/>
+
+    <field name="zone" 
+    	solrType="int"
+    	capability="zone"
+    	stored="true"
+    	indexed="true"
+    	chimpType="number"
+    	size="4"
+    	mandatory="false"
+    	variable="zone"/>
+
+    <field name="icon" 
+    	solrType="string"
+    	capability="icon"
+    	stored="true"
+    	indexed="false"
+    	chimpType="text"
+    	size="200"
+    	mandatory="false"
+    	variable="icon"/>
+
+    <field name="x" 
+    	solrType="int"
+    	capability="spatial"
+    	stored="true"
+    	indexed="false"
+    	chimpType="number"
+    	size="8"
+    	mandatory="false"
+    	variable="x"/>
+
+    <field name="y" 
+    	solrType="int"
+    	capability="spatial"
+    	stored="true"
+    	indexed="false"
+    	chimpType="number"
+    	size="8"
+    	mandatory="false"
+    	variable="y"/>
+
+    <field name="lat_lon" 
+    	solrType="location"
+    	capability="spatial"
+    	stored="false"
+    	indexed="true"
+    	chimpType="text"
+    	size="100"
+    	mandatory="false"
+    	variable="lat_lon"/>
+
+    <field name="lat_lon_0_coordinate" 
+    	solrType="double"
+    	capability="spatial"
+    	stored="false"
+    	indexed="true"
+    	chimpType="number"
+    	size="10"
+    	decimalPlaces="8"
+    	mandatory="false"
+    	variable="latitude"/>
+    	
+    <field name="lat_lon_1_coordinate" 
+    	solrType="double"
+    	capability="spatial"
+    	stored="false"
+    	indexed="true"
+    	chimpType="number"
+    	size="10"
+    	decimalPlaces="8"
+    	mandatory="false"
+    	variable="longitude"/>    	
+
+    <field name="synopsis" 
+    	solrType="string"
+    	capability="synopsis"
+    	stored="true"
+    	indexed="false"
+    	chimpType="text"
+    	size="4000"
+    	mandatory="false"
+    	variable="synopsis"/>
+
+    <field name="classification" 
+    	solrType="string"
+    	capability="classification"
+    	stored="true"
+    	indexed="true"
+    	chimpType="text"
+    	size="200"
+    	mandatory="false"
+    	variable="classification"/>
+
+    <field name="depth" 
+    	solrType="int"
+    	stored="true"
+    	indexed="true"
+    	capability="ctree" 
+    	chimpType="number"
+    	size="6"
+    	mandatory="false"
+    	variable="depth"/>
+
+    <field name="root_ancestor"
+    	solrType="long" 
+    	stored="true"
+    	indexed="true"
+    	capability="ctree"
+    	chimpType="number"
+    	size="16"
+    	mandatory="false"
+    	variable="root_ancestor"/>
+
+    <field name="language" 
+    	solrType="string"
+    	stored="true"
+    	indexed="true"
+    	capability="language"
+    	chimpType="text"
+    	size="100"
+    	mandatory="true"
+    	variable="language"/>
+
+    <field name="event_date" 
+    	solrType="date"
+    	stored="true"
+    	indexed="true"
+    	capability="eventDate"
+    	chimpType="date"
+    	mandatory="false"
+    	variable="eventDate"/>
+
+    <field name="parent_document_type" 
+    	solrType="string"
+    	stored="true"
+    	indexed="true"
+    	capability="containerDocument"
+    	chimpType="text"
+    	size="30"
+    	mandatory="false"
+    	variable="parentDocumentType"/>
+
+    <field name="parent_document_key" 
+    	solrType="string"
+    	stored="true"
+    	indexed="true"
+    	capability="containerDocument"    
+    	chimpType="text"
+    	size="100"
+    	mandatory="false"
+    	variable="parentDocumentKey"/>
+
+
+    <field name="order_numeric_1" 
+    	solrType="long"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="number"
+    	size="16"
+    	mandatory="true"
+    	variable="orderNumberic1"/>
+
+    <field name="order_alpha_1" 
+    	solrType="string"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="text"
+    	size="50"
+    	mandatory="true"
+    	variable="orderAlpha1"/>
+
+    <field name="order_numeric_2" 
+    	solrType="long"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="number"
+    	size="16"
+    	mandatory="true"
+    	variable="orderNumberic2"/>
+
+    <field name="order_alpha_2" 
+    	solrType="string"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="text"
+    	size="50"
+    	mandatory="true"
+    	variable="orderAlpha2"/>
+
+    <field name="order_numeric_3" 
+    	solrType="long"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="number"
+    	size="16"
+    	mandatory="true"
+    	variable="orderNumberic3"/>
+
+    <field name="order_alpha_3" 
+    	solrType="string"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="text"
+    	size="50"
+    	mandatory="true"
+    	variable="orderAlpha3"/>
+
+    <field name="order_numeric_4" 
+    	solrType="long"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="number"
+    	size="16"
+    	mandatory="true"
+    	variable="orderNumberic4"/>
+
+    <field name="order_alpha_4" 
+    	solrType="string"
+    	stored="false"
+    	indexed="true"
+    	capability="alphaNumericSort"    
+    	chimpType="text"
+    	size="50"
+    	mandatory="true"
+    	variable="orderAlpha4"/>
+
+    <field name="meta" 
+    	solrType="string"
+    	stored="false"
+    	indexed="true"
+    	capability="meta"    
+    	chimpType="text"
+    	size="4000"
+    	mandatory="false"
+    	variable="meta"/>
+
+    <field name="visibility" 
+    	solrType="int"
+    	stored="true"
+    	indexed="true"
+    	capability="visibility"
+    	chimpType="number"
+    	size="6"
+    	mandatory="true"
+    	variable="visibility"/>
+
+    <field name="security" 
+    	solrType="int"
+    	stored="true"
+    	indexed="true"
+    	capability="security"            
+    	chimpType="number"
+    	size="6"
+    	mandatory="true"
+    	variable="security"/>
+
+  </fieldConfig>
+  
+</solrFields>

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+  <commandConfig currentWorkingDirectory="C:/Program Files/GDAL/gdal-data" commandName="C:/Program Files/GDAL/ogr2ogr">
+  <example a='ogr2ogr -f "PostgreSQL" PG:"host=localhost user=postgres dbname=gis password=postgres active_schema=stage" "D:\raw_data\OrdnanceSurvey\Mastermap\FULL\2010-04-27\65728-SJ2434-5i610.gz" -preserve_fid  -t_srs EPSG:27700 -s_srs EPSG:27700 -append"'/>
+    <arguments>
+      <arg value="-f"/>                 
+      <arg value='"PostgreSQL"'/>
+      
+      <arg value='PG:"host=%s user=%s dbname=%s password=%s active_schema=%s"'>
+      	<placeholderContent>
+      	  <placeholder variable="host"/>
+      	  <placeholder variable="user"/>
+      	  <placeholder variable="dbname"/>
+      	  <placeholder variable="password"/>
+      	  <placeholder variable="schema"/>
+      	</placeholderContent>
+      </arg>
+      
+      <arg value='"%s"'>
+      	<placeholderContent>
+      	  <placeholder variable="fullpath"/>
+      	</placeholderContent>
+      </arg>
+               
+
+      <arg value="-t_srs EPSG:%s">
+      	<placeholderContent>
+      	  <placeholder variable="srid"/>
+      	</placeholderContent>
+      </arg>
+
+      <arg value="-s_srs EPSG:%s">
+      	<placeholderContent>
+      	  <placeholder variable="srid"/>
+      	</placeholderContent>
+      </arg>
+      	
+      
+      <arg value="-preserve_fid"/>
+      
+      <arg value="-append"/>
+
+	  <arg value="--config GML_EXPOSE_FID=YES GML_EXPOSE_GML_ID=YES"/>
+	  
+	  <arg value="-fieldTypeToString All"/>
+	  
+    </arguments>
+  </commandConfig>
+  
+  

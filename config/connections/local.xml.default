@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<connection label="Local Chimped-database" 
+  host="localhost" 
+	vendor="PostgreSQL" 
+	version="9.0"
+    dbname="chimp"
+    user="postgres"
+    password="postgres"
+    port="5432"/>
+
+
