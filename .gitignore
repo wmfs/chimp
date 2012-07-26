@@ -1,6 +1,7 @@
 __pycache__
 Thumbs.db
 .project
+.pydevproject
 *.pyc 
 .settings
 logs/
