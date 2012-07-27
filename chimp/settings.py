@@ -249,6 +249,11 @@ class Settings:
         self.appLogger.info("  extraArgs        : %s" %(str(self.extraArgs)))
         self.appLogger.info("  visibilityLevels : %s" %(str(self.visibilityLevels)))
         self.appLogger.info("  securityLevels   : %s" %(str(self.securityLevels)))        
+
+        if self.args.command != "tool" and len(self.extraArgs)>0:
+            raise Exception("Only 'tool' supports undefined arguments")
+            
+        
         self.appLogger.info("  Zones")
         for zone in self.zones:
             self.appLogger.info("    {0}: {1}.{2} ({3})".format(zone.id, zone.schema, zone.table, zone.column))
