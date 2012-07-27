@@ -118,7 +118,8 @@ class Settings:
         self.paths["resources"] = os.path.join(self.paths["parentDir"], "resources")
 
         self.paths["sqlTemplates"] = logFile = os.path.join(self.paths["resources"], "templates", "sql")
-        self.paths["specificationTemplates"] = logFile = os.path.join(self.paths["resources"], "templates", "specification")
+        self.paths["specificationTemplate"] = logFile = os.path.join(self.paths["resources"], "templates", "specification")
+        self.paths["solrServerTemplate"] = logFile = os.path.join(self.paths["resources"], "templates", "solr_server")
         self.paths["repositoryTemplates"] = logFile = os.path.join(self.paths["resources"], "templates", "repository")        
         
         # Load environment settings from settings.xml
@@ -227,6 +228,7 @@ class Settings:
         createParser = subParsers.add_parser("create", help="Create a Chimp entity")
         createParser.add_argument("--entitytype", choices=["specification", "solrserver", "repository"], help="The entity type")
         createParser.add_argument("--name", action="store", help="The name of the entity")
+        createParser.add_argument("--noexamples", action="store_true", help="When creating a new repository, exclude example specifications/Solr servers")
 
         extractParser = subParsers.add_parser("extract", help="Extract data out of Chimp")
         extractParser.add_argument("--specification", action="store", help="Specification to import data from")

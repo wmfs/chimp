@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<specification	label="Example specification"
+				vendor="MadeUp inc." 
+				version="1.0"				
+				progressReportFrequency="1000"
+				xmlns="http://www.wmfs.net/chimp">
+
+
+	<source fileWildcard="*.txt">
+		<csvFormat delimiter="," qualifier='"'  startAtLine="1" />
+	</source>
+
+
+    <record label="Example record" table="example_table" useful="true" defaultVisibility="20" defaultSecurity="10">		
+		
+		<suppliedFields>	
+			<field label="URN"         column="urn"	         type="number" size="9" mandatory="true" />
+			<field label="Description" column="description"  type="text"   size="500" mandatory="true" />
+			<field label="x"           column="x_coordinate" type="number" size="7" decimalPlaces="3" mandatory="true" />
+			<field label="y" 	       column="y_coordinate" type="number" size="7" decimalPlaces="3" mandatory="true" />
+			<field label="Owner"       column="owner"        type="text"   size="500" mandatory="false" />			
+		</suppliedFields>				
+
+		<computedData>
+			<computedDataElement>
+				<solrDocument documentName="example_record" solrServerName="default">
+					<documentContent>
+					
+						<capabilityInputs capability="documentKey">
+							<input column="urn">
+								<formatting>
+									<function name="str"/>
+								</formatting>
+							</input>							
+						</capabilityInputs>
+
+						<capabilityInputs capability="label" format="Example #{0}">
+							<input column="urn"/>
+						</capabilityInputs>
+
+						<capabilityInputs capability="searchText" delimiter=" ">
+							<input column="description"/>
+							<input column="urn">
+								<formatting>
+									<function name="str"/>
+								</formatting>
+							</input>												
+							<input column="location"/>
+						</capabilityInputs>
+
+						<capabilityInputs capability="documentRanking">
+							<input constant="40"/>						
+						</capabilityInputs>
+												
+						<capabilityInputs capability="zone">
+							<input column="x_coordinate"/>
+							<input column="y_coordinate"/>
+						</capabilityInputs>
+						
+						<capabilityInputs capability="icon">		
+							<input column="icon_type" constant="example.png" />										
+						</capabilityInputs>
+
+						<capabilityInputs capability="spatial">
+							<input column="x_coordinate"/>
+							<input column="y_coordinate"/>						
+						</capabilityInputs>
+
+						<capabilityInputs capability="synopsis" delimiter=", ">
+							<input column="description"/>
+						</capabilityInputs>
+
+						<capabilityInputs capability="language">
+							<input constant="ENG"/>						
+						</capabilityInputs>
+						
+					</documentContent>
+				</solrDocument>
+			</computedDataElement>
+						
+		</computedData>
+
+		<primaryKey>
+			<column name="urn"/>
+		</primaryKey>
+	
+	</record>
+
+</specification>

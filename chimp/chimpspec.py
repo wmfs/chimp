@@ -1244,7 +1244,7 @@ class Spec:
             appLogger.debug("")
         if dataSpecificationName is not None:
             
-            self.dataSpecificationFile = os.path.join(settings.paths["repository"],"specifications", dataSpecificationName, "{0}.xml".format(dataSpecificationName))  
+            self.dataSpecificationFile = os.path.join(settings.paths["repository"],"specifications", dataSpecificationName, "specification.xml")  
             if appLogger is not None:          
                 appLogger.debug("  dataSpecificationFile      : " + self.dataSpecificationFile)
     
