@@ -286,7 +286,7 @@ class SolrDocument:
 
     def buildSolrDocumentScript(self, paths, specificationName, solrFields, defaultVisibility, defaultSecurity, srid):
         
-        scriptFilename= os.path.join(paths["repository"], "scripts", "generated", "specification files", specificationName, "py", "solr formatting", "{0}_document_formatter.py".format(self.name))        
+        scriptFilename= os.path.join(paths["generatedSolrFormatterScriptsDir"].format(specificationName), "{0}_document_formatter.py".format(self.name))        
         scriptFile=open(scriptFilename,"w")
         
         #standardArgs="dbCursor, raw, entry, optionSets"

@@ -444,7 +444,7 @@ class Ctree:
                         "EXECUTE PROCEDURE {2}.{3}();\n\n").format(triggerName, sourceName, CALC_SCHEMA, triggerFunction.name, CTREE_SCHEMA))
         
     def generateEnableAndRecreateScript(self, repositoryPath, specificationName, closureTable, sourceSchema, sourceName):
-        filename = os.path.join(repositoryPath,"scripts", "generated", "specification files", specificationName, "sql", "ctree","{0}_enable_and_recreate.sql".format(sourceName))
+        filename = os.path.join(repositoryPath,"specifications", specificationName, "resources", "sql", "ctree", "{0}_enable_and_recreate.sql".format(sourceName))
         insertTriggerName = "e_closure_insert_for_{0}_ctree".format(sourceName)
         updateTriggerName = "e_closure_update_for_{0}_ctree".format(sourceName)
         deleteTriggerName = "e_closure_delete_for_{0}_ctree".format(sourceName)
@@ -476,7 +476,7 @@ class Ctree:
         ctreeFile.close()        
 
     def generateDisableScript(self, repositoryPath, specificationName, closureTable, sourceSchema, sourceName):
-        filename = os.path.join(repositoryPath,"scripts", "generated", "specification files", specificationName, "sql", "ctree", "{0}_disable.sql".format(sourceName))
+        filename = os.path.join(repositoryPath,"specifications", specificationName, "resources", "sql", "ctree", "{0}_disable.sql".format(sourceName))
         insertTriggerName = "e_closure_insert_for_{0}_ctree".format(sourceName)
         updateTriggerName = "e_closure_update_for_{0}_ctree".format(sourceName)
         deleteTriggerName = "e_closure_delete_for_{0}_ctree".format(sourceName)

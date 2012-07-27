@@ -319,7 +319,7 @@ class SolrServer:
         self.name = serverName
         
         # Parse XML        
-        filename = os.path.join(settings.paths["repository"], "solr servers", "{0}.xml".format(serverName))                
+        filename = os.path.join(settings.paths["repository"], "solr_servers", serverName, "solr_server.xml")                
         xmldoc = xml.dom.minidom.parse(filename)
         solrServerTag = xmldoc.getElementsByTagName("solrServer")[0]
         solrTag = solrServerTag.getElementsByTagName("solr")[0]

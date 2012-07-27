@@ -129,18 +129,40 @@ class Settings:
         self.paths["repository"] = self.env["repositoryPath"]
 
         # Well, if you thought that was bad, feast on this lot:
-        self.paths["generatedScriptsDir"] = os.path.join(self.paths["repository"], "scripts", "generated", "specification files", "{0}")     
-        self.paths["generatedSQLScriptsDir"] = os.path.join(self.paths["generatedScriptsDir"], "sql")
-        self.paths["buildSQLFile"] = os.path.join(self.paths["generatedSQLScriptsDir"], "install", "build_{0}.sql".format("{0}"))
-        self.paths["dropSQLFile"] = os.path.join(self.paths["generatedSQLScriptsDir"], "install", "drop_{0}.sql".format("{0}"))
+#        self.paths["generatedScriptsDir"] = os.path.join(self.paths["repository"], "scripts", "generated", "specification files", "{0}")     
+#        self.paths["generatedSQLScriptsDir"] = os.path.join(self.paths["generatedScriptsDir"], "sql")
+#        self.paths["buildSQLFile"] = os.path.join(self.paths["generatedSQLScriptsDir"], "install", "build_{0}.sql".format("{0}"))
+#        self.paths["dropSQLFile"] = os.path.join(self.paths["generatedSQLScriptsDir"], "install", "drop_{0}.sql".format("{0}"))
+#        self.paths["generatedIndexesSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "indexes")
+#        self.paths["generatedImportSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "import")            
+#        self.paths["generatedMVSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "mv")
+#        self.paths["generatedValidationSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "validation")
+#        self.paths["generatedPythonScriptsDir"] = os.path.join(self.paths["generatedScriptsDir"], "py")
+#        self.paths["generatedTransformationPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "transformation")
+#        self.paths["generatedCalculatedPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "calculated")
+#        self.paths["generatedSolrFormatterScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "solr formatting")
+
+
+#        self.paths["generatedScriptsDir"] = os.path.join(self.paths["repository"], "scripts", "generated", "specification files", "{0}")     
+        rep = self.paths["repository"]
+        self.paths["generatedSQLScriptsDir"] = os.path.join(rep, "specifications", "{0}", "resources", "sql")
+        
+        
+        
+        self.paths["buildSQLFile"] = os.path.join(rep, "specifications", "{0}", "resources", "sql", "install", "build_{0}.sql")
+        self.paths["generatedImportSQLScriptsDir"] = os.path.join(rep, "specifications", "{0}", "resources", "sql", "import")
+
+        self.paths["generatedPythonScriptsDir"] = os.path.join(rep, "specifications", "{0}", "resources", "py")
+        self.paths["generatedTransformationPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "transformation")
+        
+        self.paths["dropSQLFile"] = os.path.join(self.paths["generatedSQLScriptsDir"], "install", "drop_{0}.sql")
         self.paths["generatedIndexesSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "indexes")
-        self.paths["generatedImportSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "import")            
+#        self.paths["generatedImportSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "import")            
         self.paths["generatedMVSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "mv")
         self.paths["generatedValidationSQLScriptsDir"] = os.path.join(self.paths["generatedSQLScriptsDir"], "validation")
-        self.paths["generatedPythonScriptsDir"] = os.path.join(self.paths["generatedScriptsDir"], "py")
-        self.paths["generatedTransformationPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "transformation")
-        self.paths["generatedCalculatedPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "calculated")
-        self.paths["generatedSolrFormatterScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "solr formatting")
+#        self.paths["generatedTransformationPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "transformation")
+#        self.paths["generatedCalculatedPythonScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "calculated")
+        self.paths["generatedSolrFormatterScriptsDir"] = os.path.join(self.paths["generatedPythonScriptsDir"], "solr_formatting")
 
 
         # Establish logging
