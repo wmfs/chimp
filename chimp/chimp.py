@@ -89,8 +89,11 @@ elif command == "clean":
 elif command == "create":
     if settings.args.entitytype == "specification":
         chimpcreate.createSpecification(settings, settings.args.name)    
-    else:
+    elif settings.args.entitytype == "solrserver":
         chimpcreate.createSolrServer(settings, settings.args.name)
+    elif settings.args.entitytype == "repository":
+        chimpcreate.createRepository(settings)
+
 
 elif command=="extract":
     extractProcessor = extract.Extract(settings)

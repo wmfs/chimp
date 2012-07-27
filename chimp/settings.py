@@ -225,7 +225,7 @@ class Settings:
         cleanParser.add_argument("--force", action="store_true", help="S")
         
         createParser = subParsers.add_parser("create", help="Create a Chimp entity")
-        createParser.add_argument("--entitytype", choices=["specification", "solrserver"], help="The entity type")
+        createParser.add_argument("--entitytype", choices=["specification", "solrserver", "repository"], help="The entity type")
         createParser.add_argument("--name", action="store", help="The name of the entity")
 
         extractParser = subParsers.add_parser("extract", help="Extract data out of Chimp")

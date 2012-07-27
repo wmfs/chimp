@@ -8,6 +8,36 @@ import os
 import shutil
 from shutil import ignore_patterns
 
+
+def createRepository(settings):
+    appLogger = settings.appLogger
+    destPath = settings.env["repositoryPath"]
+    appLogger.debug("")
+    appLogger.debug("Create repository...")
+    appLogger.debug("  destPath   : {0}".format(destPath))
+
+    pathExists = os.path.exists(destPath)
+    appLogger.debug("  Root directory exists? : {0}".format(pathExists))
+    
+    if not pathExists:
+        os.makedirs(destPath)
+        appLogger.debug("    <made root directory>")
+
+    srcDir = os.path.join(settings.paths["repositoryTemplates"])
+    
+    dirs = os.listdir(srcDir)
+    for d in dirs:
+        fullSourcePath = os.path.join(srcDir, d)
+        if os.path.isdir(fullSourcePath):
+            fullDestPath =  os.path.join(destPath, d)
+            shutil.copytree(fullSourcePath, fullDestPath)
+            appLogger.debug("  copytree: {0}".format(fullDestPath))
+        else:
+            shutil.copy(fullSourcePath, destPath)
+            appLogger.debug("  copy: {0}".format(fullSourcePath))
+          
+    
+
 def createSpecification(settings, name):
     
     # In the repository...
