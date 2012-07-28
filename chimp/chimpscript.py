@@ -530,7 +530,7 @@ def makePostgreSQLBuildScript(settings, version):
 
             # BUILD TRANFORM SCRIPTS
             # ======================
-            transformerScriptFilename = os.path.join(settings.paths["generatedTransformationPythonScriptsDir"].format(specification.name), "stage", "{0}_import_transformer.py".format(record.table))
+            transformerScriptFilename = os.path.join(settings.paths["generatedTransformationPythonScriptsDir"].format(specification.name), "stage", "{0}_stage_transformer.py".format(record.table))
             with open(transformerScriptFilename, "w") as transformerFile:                
                 transformerFile.write(scriptBuilder.getStageTransformScript(record))                    
                         

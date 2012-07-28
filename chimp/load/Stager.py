@@ -40,8 +40,8 @@ class Stager:
         for thisRecord in specification.records:
             if thisRecord.useful:
                 
-                moduleFilename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specifications",specification.name,"resources", "py","transformation","stage"), "%s_import_transformer.py" %(thisRecord.table))
-                module = imp.load_source("%s_import_transformer.py" %(thisRecord.table), moduleFilename)
+                moduleFilename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specifications",specification.name,"resources", "py","transformation","stage"), "%s_stage_transformer.py" %(thisRecord.table))
+                module = imp.load_source("%s_stage_transformer.py" %(thisRecord.table), moduleFilename)
                 self.transformFunctions[thisRecord.table] = module.transformSuppliedValues
              
         
