@@ -6,7 +6,7 @@ Licensed under the GNU General Public License v3. See LICENCE.txt for details.
 
 Contact: tim.needham@wmfs.net
 
-(c) West Midlands Fire Service 2011
+(c) West Midlands Fire Service 2012
 
 
 
