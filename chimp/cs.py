@@ -8,19 +8,6 @@ import os.path
 
 def getChimpScriptFilenameToUse(repositoryPath, folders, filename):
 
-    # Does file exist in the "custom" branch?
-   
-#    fullPath = os.path.join(repositoryPath, "scripts", "custom")
-#    for thisFolder in folders:
-#        fullPath = os.path.join(fullPath, thisFolder)
-#    fullPath = os.path.join(fullPath, filename)
-#    
-#    if not os.path.exists(fullPath):
-#        fullPath = os.path.join(repositoryPath, "scripts", "generated")
-#        for thisFolder in folders:
-#            fullPath = os.path.join(fullPath, thisFolder)
-#        fullPath = os.path.join(fullPath, filename)
-
     fullPath = repositoryPath
     for thisFolder in folders:
         fullPath = os.path.join(fullPath, thisFolder)
