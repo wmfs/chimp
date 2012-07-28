@@ -73,7 +73,7 @@ class Loader:
 
         # Grab transformer function
         # =========================           
-        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",specification.name,"py","transformation","editable"), "%s_editable_transformer.py" %(table))            
+        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specification.name, "resources", "py", "transformation","editable"), "%s_editable_transformer.py" %(table))            
         module = imp.load_source("%s_editable_transformer.py" %(table), moduleFilename)
         transformFunction = module.transformSuppliedValues              
           
@@ -349,7 +349,7 @@ class Loader:
 
                     
         # Grab transformer function           
-        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",specification.name,"py","transformation","editable"), "%s_editable_transformer.py" %(thisRecord.table))            
+        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specification.name, "resources", "py", "transformation","editable"), "%s_editable_transformer.py" %(thisRecord.table))            
         module = imp.load_source("%s_editable_transformer.py" %(thisRecord.table), moduleFilename)
         transformFunction = module.transformSuppliedValues              
 
@@ -628,7 +628,7 @@ class Loader:
 
             
         # Grab transformer functions            
-        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",specification.name,"py","transformation","import"), "{0}_import_transformer.py".format(table))
+        moduleFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specification.name, "resources", "py","transformation","import"), "{0}_import_transformer.py".format(table))
         module = imp.load_source("{0}_import_transformer.py".format(record.table), moduleFilename)            
         transformer = module.transformSuppliedValues
 

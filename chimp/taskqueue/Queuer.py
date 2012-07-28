@@ -92,19 +92,19 @@ class Queuer:
             
     def _queueCtreeDisable(self, settings, groupId, sourceName):        
         args = {}
-        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "drop_ctree_%s_closure_indexes.sql" % (sourceName))                        
+        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","indexes"), "drop_ctree_%s_closure_indexes.sql" % (sourceName))                        
         args["filename"] = filename
         self.queue.queueTask(groupId,  self.stream, "script" , "Drop %s closure indexes" %(sourceName), None, None, None, json.dumps(args), False)            
         
         args = {}
-        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","ctree"), "%s_disable.sql" % (sourceName))                        
+        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","ctree"), "%s_disable.sql" % (sourceName))                        
         args["filename"] = filename
         self.queue.queueTask(groupId,  self.stream, "script" , "Disable %s closure tree" %(sourceName), None, None, None, json.dumps(args), False)            
 
 
     def _queueCtreeEnable(self, settings, groupId, sourceName):        
         args = {}
-        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","ctree"), "%s_enable_and_recreate.sql" % (sourceName))                                                                
+        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","ctree"), "%s_enable_and_recreate.sql" % (sourceName))                                                                
         args["filename"] = filename
         self.queue.queueTask(groupId,  self.stream, "script" , "Build %s closure tree" %(sourceName), None, None, None, json.dumps(args), False)            
 
@@ -163,7 +163,7 @@ class Queuer:
             for thisRecord in settings.specification.records:
                 if thisRecord.useful:
                     args = {}
-                    filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "drop_import_%s_indexes.sql" % (thisRecord.table))                        
+                    filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", self.specificationName, "resources", "sql", "indexes"), "drop_import_%s_indexes.sql" % (thisRecord.table))                        
                     args["filename"] = filename                               
                     self.queue.queueTask(groupId, self.stream, "script" , "Drop import.%s indexes" %(thisRecord.table), None, None, None, json.dumps(args), False)            
         
@@ -175,12 +175,12 @@ class Queuer:
                 enableMv = True
         
                 args = {}
-                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "drop_mv_%s_indexes.sql" % (thisEntity.name))                        
+                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources","sql","indexes"), "drop_mv_%s_indexes.sql" % (thisEntity.name))                        
                 args["filename"] = filename
                 self.queue.queueTask(groupId,  self.stream, "script" , "Drop %s mv indexes" %(thisEntity.name), None, None, None, json.dumps(args), False)            
                 
                 args = {}
-                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql", "mv"), "%s_disable.sql" % (thisEntity.name))                        
+                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql", "mv"), "%s_disable.sql" % (thisEntity.name))                        
                 args["filename"] = filename
                 self.queue.queueTask(groupId, self.stream,  "script" , "Disable %s mv" %(thisEntity.name), None, None, None,json.dumps(args), False)            
         
@@ -245,7 +245,7 @@ class Queuer:
 
                     # ADD INDEXES
                     args = {}
-                    filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "create_import_%s_indexes.sql" % (thisRecord.table))                        
+                    filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","indexes"), "create_import_%s_indexes.sql" % (thisRecord.table))                        
                     args["filename"] = filename            
                     self.queue.queueTask(groupId,  self.stream, "script" , "Create import.%s indexes" %(thisRecord.table), None, None, None, json.dumps(args), False)            
                     self.queue.queueCheckpoint(groupId, self.stream, "major", settings.args.tolerancelevel, self.commitFrequency, self.checkpointBehaviour)
@@ -269,7 +269,7 @@ class Queuer:
                 for thisRecord in settings.specification.records:
                     if thisRecord.useful:
                         args = {}
-                        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "drop_editable_%s_indexes.sql" % (thisRecord.table))                                            
+                        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", self.specificationName, "resources", "sql","indexes"), "drop_editable_%s_indexes.sql" % (thisRecord.table))                                            
                         args["filename"] = filename            
                         self.queue.queueTask(groupId,  self.stream, "script" , "Drop editable.%s indexes" %(thisRecord.table), None, None, None, json.dumps(args), False)            
             
@@ -301,7 +301,7 @@ class Queuer:
                 for thisRecord in settings.specification.records:
                     if thisRecord.useful:
                         args = {}
-                        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "create_editable_%s_indexes.sql" % (thisRecord.table))                    
+                        filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","indexes"), "create_editable_%s_indexes.sql" % (thisRecord.table))                    
                         args["filename"] = filename            
                         self.queue.queueTask(groupId,  self.stream, "script" , "Create editable.%s indexes" %(thisRecord.table), None, None, None, json.dumps(args), False)            
                         self.queue.queueCheckpoint(groupId, self.stream, "major", settings.args.tolerancelevel, self.commitFrequency, self.checkpointBehaviour)  
@@ -334,13 +334,13 @@ class Queuer:
             self.queue.queueCheckpoint(groupId, self.stream, "major", settings.args.tolerancelevel, self.commitFrequency, self.checkpointBehaviour)  
             for thisEntity in settings.specification.entities:
                 args = {}            
-                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","mv"), "%s_enable_and_recreate.sql" % (thisEntity.name))                                            
+                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","mv"), "%s_enable_and_recreate.sql" % (thisEntity.name))                                            
                 args["filename"] = filename            
                 self.queue.queueTask(groupId,  self.stream, "script" , "Enable %s mv" %(thisEntity.name), None, None, None, json.dumps(args), False)                
                 self.queue.queueCheckpoint(groupId, self.stream, "major", settings.args.tolerancelevel, self.commitFrequency, self.checkpointBehaviour)
                 
                 args = {}
-                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",self.specificationName,"sql","indexes"), "create_mv_%s_indexes.sql" % (thisEntity.name))                                            
+                filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",self.specificationName,"resources", "sql","indexes"), "create_mv_%s_indexes.sql" % (thisEntity.name))                                            
                 args["filename"] = filename
                 self.queue.queueTask(groupId,  self.stream, "script" , "Create %s indexes" %(thisEntity.name), None, None, None, json.dumps(args), False)                
                 self.queue.queueCheckpoint(groupId, self.stream, "major", settings.args.tolerancelevel, self.commitFrequency, self.checkpointBehaviour)
@@ -590,13 +590,13 @@ class Queuer:
     
     def _queueClearStageTask(self, groupId, stream, specificationName, paths):
         args = {}
-        filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specification files",specificationName,"sql","import"), "prepare_%s_stage.sql" % (specificationName))    
+        filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specifications",specificationName,"resources", "sql","import"), "prepare_%s_stage.sql" % (specificationName))    
         args["filename"] = filename
         self.queue.queueTask(groupId, stream, "script" , "Prepare stage", None, None, None, json.dumps(args), False)
 
     def _queueFinishStageTask(self, groupId, stream, specificationName, paths):
         args = {}
-        filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specification files",specificationName,"sql","import"), "post_%s_staging.sql" % (specificationName))    
+        filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specifications",specificationName,"resources", "sql","import"), "post_%s_staging.sql" % (specificationName))    
         args["filename"] = filename
         self.queue.queueTask(groupId, stream,  "script" , "Finish stage", None, None, None, json.dumps(args), False)
 
@@ -605,7 +605,7 @@ class Queuer:
         if removeDuplicates:
             self.queue.queueCheckpoint(groupId, stream, "major", toleranceLevel, commitFrequency, checkpointBehaviour)
             args = {}
-            filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specification files",specificationName,"sql","import"), "remove_%s_duplicates_from_stage.sql" % (specificationName))    
+            filename = cs.getChimpScriptFilenameToUse(paths["repository"], ("specifications",specificationName,"resources", "sql","import"), "remove_%s_duplicates_from_stage.sql" % (specificationName))    
             args["filename"] = filename
             self.queue.queueTask(groupId, stream,  "script" , "Remove duplicates", None, None, None, json.dumps(args), False)
             self.queue.queueCheckpoint(groupId, stream, "major", toleranceLevel, commitFrequency, checkpointBehaviour)        

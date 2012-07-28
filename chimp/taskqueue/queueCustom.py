@@ -28,7 +28,7 @@ def queueTasks(queuer, settings, stream, specificationRestriction, groupId, appL
         inputSourceName = custom[2]
         outputCustomList = custom[3].split(",")
     
-        processorFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files", specificationName,"py","calculated"), "{0}_calculated_data_processor.py".format(inputSourceName))
+        processorFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specificationName,"resources", "py","calculated"), "{0}_calculated_data_processor.py".format(inputSourceName))
         processorFilename = processorFilename.replace("\\", "\\\\") 
         
         

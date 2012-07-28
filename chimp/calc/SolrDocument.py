@@ -356,7 +356,7 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
     serverName = args["serverName"]
     fieldCount = args["fieldCount"] - 1
     filename = "{0}_document_formatter.py".format(documentName)
-    moduleToUse = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ["specification files", args["specification"], "py", "solr formatting"], filename)
+    moduleToUse = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ["specifications", args["specification"], "resources", "py", "solr_formatting"], filename)
     module = imp.load_source(filename, moduleToUse)
     conversionFunctions = module.DocumentFormatter()
     conversionFunction = conversionFunctions.getSolrDocument

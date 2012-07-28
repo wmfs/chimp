@@ -10,17 +10,29 @@ def getChimpScriptFilenameToUse(repositoryPath, folders, filename):
 
     # Does file exist in the "custom" branch?
    
-    fullPath = os.path.join(repositoryPath, "scripts", "custom")
+#    fullPath = os.path.join(repositoryPath, "scripts", "custom")
+#    for thisFolder in folders:
+#        fullPath = os.path.join(fullPath, thisFolder)
+#    fullPath = os.path.join(fullPath, filename)
+#    
+#    if not os.path.exists(fullPath):
+#        fullPath = os.path.join(repositoryPath, "scripts", "generated")
+#        for thisFolder in folders:
+#            fullPath = os.path.join(fullPath, thisFolder)
+#        fullPath = os.path.join(fullPath, filename)
+
+    fullPath = repositoryPath
     for thisFolder in folders:
         fullPath = os.path.join(fullPath, thisFolder)
+    customPath = os.path.join(fullPath, "custom", filename)
     fullPath = os.path.join(fullPath, filename)
-    
-    if not os.path.exists(fullPath):
-        fullPath = os.path.join(repositoryPath, "scripts", "generated")
-        for thisFolder in folders:
-            fullPath = os.path.join(fullPath, thisFolder)
-        fullPath = os.path.join(fullPath, filename)
-    return(fullPath)
+
+    if os.path.exists(customPath):
+        r = customPath
+    else:
+        r = fullPath
+
+    return(r)
 
 def addSlashes(text):
     if text is not None:

@@ -5,7 +5,7 @@ Created on 18 Jan 2012
 '''
 import chimpspec
 import json
-import search
+#import search
 from calc.Pin import processSynchronizePins 
 from calc.CustomColumn import processSynchronizeCustomColumn
 from calc.Ctree import processCtrees

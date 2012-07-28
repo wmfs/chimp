@@ -2,8 +2,8 @@ import xml.dom.minidom
 import cs
 import re
 import os.path
-import search
-import pinhead
+#import search
+#import pinhead
 import itertools
 import calc
 import imp

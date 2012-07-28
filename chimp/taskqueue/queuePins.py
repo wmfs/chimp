@@ -32,7 +32,7 @@ def queueTasks(queuer, settings, stream, specificationRestriction, groupId, appL
         
         if not pinsExist:
             args = {}
-            filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",specificationName,"sql","indexes"), "drop_pinhead_%s_indexes.sql" % (pinName))
+            filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications",specificationName,"resources","sql","indexes"), "drop_pinhead_%s_indexes.sql" % (pinName))
             appLogger.debug("      No pins... drop via '{0}'".format(filename))                                                                                    
             args["filename"] = filename
             queuer.queue.queueTask(groupId,  stream,  "script" , "Drop %s pin indexes" %(pinName), None, None, None, json.dumps(args), False)                                                        
@@ -64,7 +64,7 @@ def queueTasks(queuer, settings, stream, specificationRestriction, groupId, appL
         args["outputColumnList"] = pin[8]
         args["whereClause"] = pin[9]
         
-        processorFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files", specificationName,"py","calculated"), "{0}_calculated_data_processor.py".format(sourceName))
+        processorFilename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specificationName, "resources", "py","calculated"), "{0}_calculated_data_processor.py".format(sourceName))
         processorFilename = processorFilename.replace("\\", "\\\\") 
         args["processorFilename"] = processorFilename
 
@@ -76,7 +76,7 @@ def queueTasks(queuer, settings, stream, specificationRestriction, groupId, appL
 
         if not pinsExist:
             args = {}
-            filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specification files",specificationName,"sql","indexes"), "create_pinhead_%s_indexes.sql" % (pinName))                                                                                    
+            filename = cs.getChimpScriptFilenameToUse(settings.paths["repository"], ("specifications", specificationName, "resources", "sql","indexes"), "create_pinhead_%s_indexes.sql" % (pinName))                                                                                    
             appLogger.debug("      Rebuild pins... via '{0}'".format(filename))
             args["filename"] = filename
             queuer.queue.queueTask(groupId,  stream, "script" , "Build %s pin indexes" %(pinName), None, None, None, json.dumps(args), False)            

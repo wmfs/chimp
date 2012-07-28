@@ -1,7 +1,7 @@
 import cs
 import datetime
 import os.path
-import search
+#import search
 from chimpsql import DBObjectRegistry
 from chimpsql import SpecificationSQLBuilder
 from codegen import SpecificationScriptBuilder
