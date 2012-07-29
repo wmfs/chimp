@@ -1,10 +1,71 @@
 <?xml version="1.0"?>
 
+<!-- 
+
+     IMPORTANT
+     =========
+     You will need to copy the provided [settings.xml.default] file to a new file called [settings.xml],
+     Then make your changes to your new [settings.xml] file.
+     More help is available here:
+       https://github.com/wmfs/chimp/wiki/Installation-and-configuration
+
+     In the values below, you will need to check:
+       - repositoryPath  
+       - psqlExecutable
+       - srid     
+-->
+
 <settings>
 
   <registry>
-    <key name="repositoryPath" value="D:/my_projects/chimp_repository" />
+    
+    <!--     
+    repositoryPath
+    ==============
+    Set <repositoryPath> value to where Chimp will find a Chimp repository.'
+    Notes:
+      * This directory should be away from your existing Chimp directory
+      * The final directory in the path should **not** exist already (Chimp will create it)
+      * So in the *example* path provided below... 
+        - "d:/my_projects/data" would already exist
+        - The "chimp_repository" directory doesn't exist (yet)
+        - Chimp will create a new directory called "chimp_repository" -->
+            
+    <key name="repositoryPath" value="d:/my_projects/data/chimp_repository" />
+    
+    
+    <!--		
+	  psqlExecutable
+	  ==============
+	  Set <psqlExecutable> value to where PostgreSQL's psql command can be found. -->
+	        
+    <key name="psqlExecutable" value="C:\Program Files\PostgreSQL\9.0\bin\psql.exe"/>
+    
+    
+    <!--    
+    srid
+    ====
+    This is the Spatial Reference System Identifier (SRID) indicating which coordinate system Chimp should work with.     
+    Some popular coordinate systems:
+    
+      SRID  Label
+      ====  =====
+    - 4326  World Geodetic System - AKA Lat/Long  
+    - 27700 British National Grid
+    - 29901 Irish National Grid
+    
+    For a list of SRIDs Chimp supports, connect to a PostGIS-enabled datbase and run the following SQL:
+    
+    select *
+	  from public.spatial_ref_sys
+	  order by srid -->    
+    
     <key name="srid" value="27700" />
+    
+    
+    <!-- 
+    Other values 
+    ============ -->    
     <key name="checkConstraintSetSizeThreshold" value="10" />
     <key name="loggingLevel" value="debug" />
     <key name="logPath" value="./logs" />
@@ -19,7 +80,6 @@
     <key name="searchIndexRebuildThreshold" value="100000" />
     <key name="dataCommitThreshold" value="1000000" />
     <key name="buildDialect" value="default" />
-    <key name="psqlExecutable" value="C:\Program Files\PostgreSQL\9.0\bin\psql.exe"/>
     <key name="defaultZoneId" value="3" />
   </registry>
   
