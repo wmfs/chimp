@@ -3,7 +3,7 @@
 <settings>
 
   <registry>
-    <key name="repositoryPath" value="D:/pythonprojects/chimp.repository" />
+    <key name="repositoryPath" value="D:/my_projects/chimp_repository" />
     <key name="srid" value="27700" />
     <key name="checkConstraintSetSizeThreshold" value="10" />
     <key name="loggingLevel" value="debug" />
