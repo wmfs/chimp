@@ -73,7 +73,6 @@
     <key name="logMaxBytes" value="10000000" />
     <key name="logBackupCount" value="10" />
     <key name="logFormat" value="%(asctime)s - %(levelname)s - %(message)s" />
-    <key name="otherLogPath" value="/gisfiles/Chimp/logs" />
     <key name="pinheadProgressReportFrequency" value="1000" />
     <key name="pinheadIndexRebuildThreshold" value="100000" />
     <key name="searchProgressReportFrequency" value="1000" />
