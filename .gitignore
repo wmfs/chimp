@@ -4,6 +4,3 @@ Thumbs.db
 .pydevproject
 *.pyc 
 .settings
-logs/
-temp/
-scripts/
