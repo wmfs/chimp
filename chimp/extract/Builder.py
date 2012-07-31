@@ -70,7 +70,7 @@ class Builder:
         self.formats=[]
         self.settings = settings
         self.specificationName = settings.specification.name
-        formatPath =  os.path.join(settings.paths["repository"], "specifications", self.specificationName, "extract formats")
+        formatPath =  os.path.join(settings.paths["repository"], "specifications", self.specificationName, "extract_formats")
 
         for file in os.listdir(formatPath):    
             if file.endswith(".xml"):
