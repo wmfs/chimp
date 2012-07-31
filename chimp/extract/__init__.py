@@ -245,7 +245,7 @@ class Extract:
         else:
             self.format = format
         
-        self.extractXmlFilename = os.path.join(settings.paths["repository"],"specifications", self.specificationName, "extract formats", "extract_{0}.xml".format(self.format))  
+        self.extractXmlFilename = os.path.join(settings.paths["repository"],"specifications", self.specificationName, "extract_formats", "extract_{0}.xml".format(self.format))  
         xmldoc = xml.dom.minidom.parse(self.extractXmlFilename)
         extractTag = xmldoc.getElementsByTagName("extract")[0]
         
