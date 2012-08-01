@@ -202,7 +202,7 @@ Ideally there will be only one line in the whole file that matches either of the
     		<element name="identification"
     			type="tns:recordIdentificationType" maxOccurs="1"
     			minOccurs="0">
-    		</element>
+    		</element>
     		<element name="suppliedFields" type="tns:suppliedFieldsType"
     			maxOccurs="unbounded" minOccurs="1">
     		</element>
