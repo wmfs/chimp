@@ -441,12 +441,12 @@ def makePostgreSQLBuildScript(settings, version):
 
                 # INSERT
                 # ======                                                                    
-                storageInsertFunction = sqlBuilder.getStorageInsertFunction(record, schemaName, storageTable, storageValidFunction)
+                storageInsertFunction = sqlBuilder.getStorageInsertFunction(record, schemaName, storageTable, storageValidFunction, settings.env["defaultDuplicateKeyBehaviour"])
                 registerAndWrite(storageInsertFunction, objectRegistry, file)
 
                 # UPDATE
                 # ======
-                storageUpdateFunction = sqlBuilder.getStorageUpdateFunction(record, schemaName, storageTable, storageValidFunction)
+                storageUpdateFunction = sqlBuilder.getStorageUpdateFunction(record, schemaName, storageTable, storageValidFunction,settings.env["defaultNoDataFoundBehaviour"])
                 registerAndWrite(storageUpdateFunction, objectRegistry, file)
 
                 # DELETE

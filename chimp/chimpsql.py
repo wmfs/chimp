@@ -1183,7 +1183,7 @@ class SpecificationSQLBuilder:
                                                    body))
 
     
-    def getStorageInsertFunction(self, record, schemaName, storageTable, storageValidFunction):
+    def getStorageInsertFunction(self, record, schemaName, storageTable, storageValidFunction, duplicatePrimaryKeyBehaviour):
         functionName = "{0}_insert".format(record.table)
         
         parameters = [SystemField("p_id", "bigint")]
@@ -1196,6 +1196,14 @@ class SpecificationSQLBuilder:
             parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]
 
 
+        if duplicatePrimaryKeyBehaviour == "ignore":
+            duplicateClause = ("  WHEN unique_violation THEN\n"
+                               "    NULL;\n")            
+        elif duplicatePrimaryKeyBehaviour in ("notice", "warning", "error", "exception"):
+            duplicateClause = ("  WHEN unique_violation THEN\n"
+                               "    v_message = shared.make_{0}('IMP006','Could not insert, duplicate primary key',NULL,1,SQLERRM);\n"
+                               "    RETURN NEXT v_message;\n".format(duplicatePrimaryKeyBehaviour))
+        
         
         return Function(functionName, schemaName,
                 [field.typeName for field in parameters],
@@ -1223,34 +1231,32 @@ class SpecificationSQLBuilder:
                 "     p_id{12}{13}{14}{15}\n"
                 ");\n" 
                 "  END IF;\n"
-                "EXCEPTION\n"
+                "EXCEPTION\n{16}"
                 "  WHEN others THEN\n"
                 "    v_message = shared.make_exception('IMP005','Unhandled exception while inserting',NULL,1,SQLERRM);\n"
                 "    RETURN NEXT v_message;\n"
                 "END;\n"
                 "$$ LANGUAGE plpgsql;\n\n").format(                                                                                                      
-                           schemaName, functionName,
-#                           "p_task_id" if schemaName == "import" else "p_source character varying",
-#                           ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
-#                           "" if schemaName == record.getDestinationTargetSchema() else ",\n  p_visibility integer,\n  p_security integer",
-                           ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]),
-
-                           storageValidFunction.schema, storageValidFunction.name,
-                           ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())),
-                           storageTable.schema, storageTable.name,
-                           
-                           "" if schemaName != "editable" else ",\n     original_source,\n     latest_source",
-                           "".join(map(lambda field: ",\n     {0}".format(field.column), record.getAllMappedFields())),
-                           "" if schemaName != "import" else ",\n     last_affirmed_task_id,\n     created_task_id,\n     modified_task_id",
-                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     visibility,\n     security",
-                           
-                           "" if schemaName != "editable" else ",\n     p_source,\n     p_source",
-                           "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())),
-                           "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id",
-                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security"
+                           schemaName, #0 
+                           functionName, #1
+                           ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]), #2
+                           storageValidFunction.schema, #3 
+                           storageValidFunction.name, #4
+                           ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())), #5
+                           storageTable.schema, #6
+                           storageTable.name, #7                      
+                           "" if schemaName != "editable" else ",\n     original_source,\n     latest_source", #8
+                           "".join(map(lambda field: ",\n     {0}".format(field.column), record.getAllMappedFields())), #9
+                           "" if schemaName != "import" else ",\n     last_affirmed_task_id,\n     created_task_id,\n     modified_task_id", #10
+                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     visibility,\n     security", #11        
+                           "" if schemaName != "editable" else ",\n     p_source,\n     p_source", #12
+                           "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())), #13
+                           "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id", #14
+                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security", #15
+                           duplicateClause #16
                            ))    
     
-    def getStorageUpdateFunction(self, record, schemaName, storageTable, storageValidFunction):
+    def getStorageUpdateFunction(self, record, schemaName, storageTable, storageValidFunction, whenNoDataFoundBehaviour):
         functionName = "{0}_update".format(record.table)
         
         parameters = []
@@ -1261,6 +1267,24 @@ class SpecificationSQLBuilder:
         parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getAllMappedFields()]    
         if schemaName == record.getDestinationTargetSchema():
             parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]        
+
+        # How to deal with a row that's not there?
+        if whenNoDataFoundBehaviour in("notice","warning","error","exception"):
+            missingRowClause = ("    GET DIAGNOSTICS v_count = ROW_COUNT;\n"               
+                                "    IF v_count = 0 THEN\n"
+                                "      v_message.level = '{0}';\n"
+                                "      v_message.code = 'IMP001';\n"
+                                "      v_message.title = 'Unable to update expected ''{1}.{2}'' record.';\n"
+                                "      v_message.affected_columns = NULL;\n"
+                                "      v_message.affected_row_count = 0;\n"
+                                "      v_message.content = 'Could not find a row with the primary key of';\n"
+                                "      {3}\n"
+                                "      RETURN NEXT v_message;\n"
+                                "    END IF;\n".format(whenNoDataFoundBehaviour, #0
+                                                       storageTable.schema, #1
+                                                       storageTable.name, #2
+                                                       "\n      ".join(map("v_message.content = v_message.content || ' ' || p_{0};".format, record.primaryKeyColumns)))) #3
+
                         
         return Function(functionName, schemaName, 
                 [field.typeName for field in parameters],
@@ -1285,42 +1309,27 @@ class SpecificationSQLBuilder:
                  "    UPDATE {6}.{7} SET\n"
                  "      {8},\n"
                  "      {9}{10}\n"
-                 "    WHERE {11};\n"
-                 "\n"                
-                 "    GET DIAGNOSTICS v_count = ROW_COUNT;\n"               
-                 "    IF v_count = 0 THEN\n"
-                 "      v_message.level = 'warning';\n"
-                 "      v_message.code = 'IMP001';\n"
-                 "      v_message.title = 'Unable to update expected ''{6}.{7}'' record.';\n"
-                 "      v_message.affected_columns = NULL;\n"
-                 "      v_message.affected_row_count = 0;\n"
-                 "      v_message.content = 'Could not find a row with the primary key of';\n"
-                 "      {12}\n"
-                 "      RETURN NEXT v_message;\n"
-                 "    END IF;\n"
-                 "  END IF;\n"
+                 "    WHERE {11};\n\n"
+                 "  END IF;\n{12}"
                  "EXCEPTION\n"
                  "  WHEN others THEN\n"
                  "    v_message = shared.make_exception('IMP006','Unhandled exception while updating',NULL,1,SQLERRM);\n"
                  "    RETURN NEXT v_message;\n"
                  "END;\n"
                  "$$ LANGUAGE plpgsql;\n\n").format(
-                            schemaName, functionName,
-#                            "p_task_id integer" if schemaName == "import" else "p_id bigint,\n  p_source character varying",
-#                            ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
-#                             "" if schemaName == record.getDestinationTargetSchema() else ",\n  p_visibility integer,\n  p_security integer",
-                            ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]),
-                            
-                            storageValidFunction.schema, storageValidFunction.name,
-                            ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())),
-            #                file.write(cs.prefixedDelimitedStringList(paramNames,"    p_", ",\n"))
-                            storageTable.schema, storageTable.name,
-                            
-                            "last_affirmed = now(),\n      last_affirmed_task_id = p_task_id" if schemaName == "import" else "latest_source = p_source",
-                            ",\n      ".join(map(lambda field: "{0} = p_{0}".format(field.column), record.getAllMappedFields())),
-                            "" if schemaName != record.getDestinationTargetSchema() else ",\n      visibility = p_visibility,\n      security = p_security",
-                            "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns)),
-                            "\n      ".join(map("v_message.content = v_message.content || ' ' || p_{0};".format, record.primaryKeyColumns))))         
+                            schemaName, #0 
+                            functionName, #1
+                            ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]), #2                            
+                            storageValidFunction.schema, #3 
+                            storageValidFunction.name, #4
+                            ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())), #5
+                            storageTable.schema, #6
+                            storageTable.name, #7                          
+                            "last_affirmed = now(),\n      last_affirmed_task_id = p_task_id" if schemaName == "import" else "latest_source = p_source", #8
+                            ",\n      ".join(map(lambda field: "{0} = p_{0}".format(field.column), record.getAllMappedFields())), #9
+                            "" if schemaName != record.getDestinationTargetSchema() else ",\n      visibility = p_visibility,\n      security = p_security", #10
+                            "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns)), #11
+                            missingRowClause)) #12         
 
     
     def getStorageDeleteFunction(self, record, schemaName, storageTable, storageDeletableFunction):

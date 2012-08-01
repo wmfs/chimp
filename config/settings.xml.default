@@ -80,6 +80,8 @@
     <key name="dataCommitThreshold" value="1000000" />
     <key name="buildDialect" value="default" />
     <key name="defaultZoneId" value="3" />
+    <key name="defaultDuplicateKeyBehaviour" value="error" />
+    <key name="defaultNoDataFoundBehaviour" value="warning" />
   </registry>
   
   <visibilityLevels>

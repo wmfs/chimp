@@ -1467,7 +1467,34 @@ class Spec:
                 appLogger.debug("  Indentification")            
                 appLogger.debug("    fullRegex                : "+cs.prettyNone(self.fullRegex))                        
                 appLogger.debug("    changeRegex              : "+cs.prettyNone(self.changeRegex))                        
-                                     
+
+
+
+            # Grab behaviours and default if not provided.
+            dmlBehaviourSet=False
+            behaviourTag = specificationTag.getElementsByTagName("behaviour")
+            if behaviourTag.length>0:
+                behaviourTag = behaviourTag [0]
+                dmlBehaviourTag = behaviourTag.getElementsByTagName("dml")
+                if dmlBehaviourTag.length>0:
+                    dmlBehaviourTag = dmlBehaviourTag [0]
+                    self.whenDuplicatePrimaryKeyBehaviour = cs.grabAttribute(dmlBehaviourTag,"whenDuplicatePrimaryKey")
+                    self.whenNoDataFoundBehaviour = cs.grabAttribute(dmlBehaviourTag,"whenNoDataFound")
+                    dmlBehaviourSet=True
+            if appLogger is not None:
+                appLogger.debug("")
+                appLogger.debug("  Behaviour")
+            
+            if not dmlBehaviourSet:
+                self.whenDuplicatePrimaryKeyBehaviour = settings.env["defaultDuplicateKeyBehaviour"]
+                self.whenNoDataFoundBehaviour = settings.env["defaultNoDataFoundBehaviour"]
+                if appLogger is not None:
+                    appLogger.debug("  (taking defaults)")
+                    
+            if appLogger is not None:
+                appLogger.debug("    whenDuplicatePrimaryKeyBehaviour  : {0}".format(self.whenDuplicatePrimaryKeyBehaviour))
+                appLogger.debug("    whenNoDataFoundBehaviour          : {0}".format(self.whenNoDataFoundBehaviour))
+                
             #Init counters
             self.fileCount=None
             self.lineCount=None
