@@ -26,7 +26,7 @@ def installChimp(settings, zone):
         # ====================
         # DROP ZONE OBJECTS
         # ====================        
-        dropZoneFilename = os.path.join(settings.paths["repository"], "scripts", "generated", "zone files","drop_zones.sql")
+        dropZoneFilename = os.path.join(settings.paths["repository"], "zone_files","drop_zones.sql")
         if os.path.exists(dropZoneFilename):
             PSQLExecutor(settings).execute(dropZoneFilename)         
         file = open(dropZoneFilename, "w")                        
@@ -39,7 +39,7 @@ def installChimp(settings, zone):
         # ====================
         # INSTALL ZONE OBJECTS
         # ====================        
-        installZoneFilename = os.path.join(settings.paths["repository"], "scripts", "generated", "zone files","install_zones.sql")
+        installZoneFilename = os.path.join(settings.paths["repository"], "zone_files","install_zones.sql")
         file = open(installZoneFilename, "w")                        
         script = "-- Install zone objects:\n\n"
     

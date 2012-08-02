@@ -1,1 +1,2 @@
-/.hackery
+*
+!/.gitignore
