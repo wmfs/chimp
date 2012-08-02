@@ -54,7 +54,7 @@
     - 27700 British National Grid
     - 29901 Irish National Grid
     
-    For a list of SRIDs Chimp supports, connect to a PostGIS-enabled datbase and run the following SQL:
+    For a list of SRIDs Chimp supports, connect to a PostGIS-enabled database and run the following SQL:
     
     select *
 	  from public.spatial_ref_sys
