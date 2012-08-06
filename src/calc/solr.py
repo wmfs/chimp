@@ -553,7 +553,7 @@ class SolrServer:
     #map(lambda field: ",\n    {0}".format(field.column), EDITABLE_SYSTEM_FIELDS)),
     
     def generateInstallScript(self, repositoryPath, solrSettings, solrFields):
-        installFilename = os.path.join(repositoryPath, "scripts", "generated", "solr server files", self.name, "install", "install_{0}.sql".format(self.name))        
+        installFilename = os.path.join(repositoryPath, "solr_servers", self.name, "install", "install_{0}.sql".format(self.name))        
         file=open(installFilename, "w")    
         objectRegistry = DBObjectRegistry()
             
@@ -589,7 +589,7 @@ class SolrServer:
                 
         file.close()
 
-        dropFilename = os.path.join(repositoryPath, "scripts", "generated", "solr server files", self.name, "install", "drop_{0}.sql".format(self.name))        
+        dropFilename = os.path.join(repositoryPath, "solr_servers", self.name, "install", "drop_{0}.sql".format(self.name))        
         objectRegistry.writeDropScript(dropFilename)
 
         # Build index scripts
