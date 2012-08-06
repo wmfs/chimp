@@ -601,11 +601,11 @@ class SolrServer:
 
         for thisTable in tableList:                    
             filename = "drop_{0}_indexes.sql".format(str(thisTable).replace(".", "_"))
-            filename = os.path.join(repositoryPath, "scripts",  "generated", "solr server files", self.name, "indexes", filename)
+            filename = os.path.join(repositoryPath, "solr_servers", self.name, "indexes", filename)
             dropFile = open(filename, "w")
 
             filename = "create_{0}_indexes.sql".format(str(thisTable).replace(".", "_"))
-            filename = os.path.join(repositoryPath, "scripts",  "generated", "solr server files", self.name, "indexes", filename)
+            filename = os.path.join(repositoryPath, "solr_servers", self.name, "indexes", filename)
             createFile = open(filename,"w")
 
             for index in objectRegistry.indexes:             
