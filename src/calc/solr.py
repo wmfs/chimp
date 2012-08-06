@@ -661,7 +661,7 @@ class SolrServer:
         sourceFile = open(sourceFilename, "r")
         
         # Establish target file
-        targetFilename = os.path.join(repositoryPath, "solr_server", self.name, "export", "schema.xml")                            
+        targetFilename = os.path.join(repositoryPath, "solr_servers", self.name, "export", "schema.xml")                            
         targetFile = open(targetFilename, "w")
         
         replicate = True
