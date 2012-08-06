@@ -661,7 +661,7 @@ class SolrServer:
         sourceFile = open(sourceFilename, "r")
         
         # Establish target file
-        targetFilename = os.path.join(repositoryPath, "scripts", "generated", "solr server files", self.name, "export", "schema.xml")                            
+        targetFilename = os.path.join(repositoryPath, "solr_server", self.name, "export", "schema.xml")                            
         targetFile = open(targetFilename, "w")
         
         replicate = True
@@ -712,7 +712,7 @@ class SolrServer:
         sourceFile = open(sourceFilename, "r")
         
         
-        filename = os.path.join(repositoryPath, "scripts", "generated", "solr server files", self.name, "export", "solrconfig.xml")
+        filename = os.path.join(repositoryPath, "solr_servers", self.name, "export", "solr_config.xml")
         outputFile = open(filename, "w")
         
         for line in sourceFile:
@@ -722,7 +722,7 @@ class SolrServer:
         sourceFile.close()
 
     def generateDataConfig(self, solrSettings, solrFields, repositoryPath, appLogger):
-        filename = os.path.join(repositoryPath, "scripts", "generated", "solr server files", self.name, "export", "data-config.xml")
+        filename = os.path.join(repositoryPath, "solr_servers", self.name, "export", "data-config.xml")
         file = open(filename, "w")
         
         url="{0}//{1}:{2}/{3}".format(solrSettings.registry["databaseUrlPrefix"], self.dbHost, self.dbPort, self.dbName) 
