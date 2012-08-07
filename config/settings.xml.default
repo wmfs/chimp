@@ -96,8 +96,8 @@
   </securityLevels>
 
   <zones>
-	<zone id="2" schema="areas" table="wmfs_boundary_10k_buffer" column="wkb_geometry"/>
-	<zone id="1" schema="areas" table="wmfs_boundary" column="wkb_geometry"/>
+	<zone id="2" schema="areas" table="my_boundary_plus_10k_buffer" column="wkb_geometry"/>
+	<zone id="1" schema="areas" table="my_boundary" column="wkb_geometry"/>
   </zones>
 		  
 </settings>
