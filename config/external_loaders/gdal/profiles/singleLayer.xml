@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-  <gdalProfile>
+  <externalLoaderProfile>
     <arguments>
       <arg value="-f"/>                 
       <arg value='"PostgreSQL"'/>
@@ -18,8 +18,10 @@
       	  <placeholder variable="fullpath"/>
       	</placeholderContent>
       </arg>
-               
-
+     
+     <arg value="-update"/>          
+	 <arg value="-append"/>
+ 
       <arg value="-t_srs EPSG:%s">
       	<placeholderContent>
       	  <placeholder variable="srid"/>
@@ -31,17 +33,14 @@
       	  <placeholder variable="srid"/>
       	</placeholderContent>
       </arg>
-      	           
-      <arg value="-append"/>
-      
-      <arg value="-nln %s.%s">
+      	
+      <arg value="-nln %s">
       	<placeholderContent>
-      	  <placeholder variable="schema"/>
       	  <placeholder variable="newlayername"/>      	  
       	</placeholderContent>
-      </arg>
-                      
+      </arg>                   
+           
     </arguments>
-  </gdalProfile>
+  </externalLoaderProfile>
   
   

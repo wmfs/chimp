@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
-  <gdalProfile>
+  <externalLoaderProfile>
     <arguments>
       <arg value="-f"/>                 
       <arg value='"PostgreSQL"'/>
       
-      <arg value='PG:"host=%s user=%s dbname=%s password=%s"'>
+      <arg value='PG:"host=%s user=%s dbname=%s password=%s active_schema=%s"'>
       	<placeholderContent>
       	  <placeholder variable="host"/>
       	  <placeholder variable="user"/>
       	  <placeholder variable="dbname"/>
       	  <placeholder variable="password"/>
+      	  <placeholder variable="schema"/>
       	</placeholderContent>
       </arg>
       
@@ -18,10 +19,8 @@
       	  <placeholder variable="fullpath"/>
       	</placeholderContent>
       </arg>
-     
-     <arg value="-update"/>          
-	 <arg value="-append"/>
- 
+               
+
       <arg value="-t_srs EPSG:%s">
       	<placeholderContent>
       	  <placeholder variable="srid"/>
@@ -34,13 +33,16 @@
       	</placeholderContent>
       </arg>
       	
-      <arg value="-nln %s">
-      	<placeholderContent>
-      	  <placeholder variable="newlayername"/>      	  
-      	</placeholderContent>
-      </arg>                   
-           
+      
+      <arg value="-preserve_fid"/>
+      
+      <arg value="-append"/>
+
+	  <arg value="--config GML_EXPOSE_FID=YES GML_EXPOSE_GML_ID=YES"/>
+	  
+	  <arg value="-fieldTypeToString All"/>
+	  
     </arguments>
-  </gdalProfile>
+  </externalLoaderProfile>
   
   

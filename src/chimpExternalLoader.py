@@ -52,23 +52,51 @@ class ExternalLoader():
         return(command)
         
         
-    def __init__(self,name,context,configRoot):
+    def __init__(self,name, profile, configRoot):
 
         self.name = name
-        self.context = context
-        self.loaderFile = os.path.join(configRoot,"external loaders", name, "profiles", context,"%s.xml"%(context))
-
-        xmldoc = xml.dom.minidom.parse(self.loaderFile)
-        commandConfigTag = xmldoc.getElementsByTagName("commandConfig")
+        self.profile = profile
         
-        if len(commandConfigTag) >0:
-            commandConfigTag = commandConfigTag[0]
-    
-            self.commandName=cs.grabAttribute(commandConfigTag,"commandName")
-            self.currentWorkingDirectory=cs.grabAttribute(commandConfigTag,"currentWorkingDirectory")
+        # Grab registry settings
+        
+        self.configFile = os.path.join(configRoot,"external_loaders", name, "loader_config.xml")
+        xmldoc = xml.dom.minidom.parse(self.configFile)
+        loaderConfigTag = xmldoc.getElementsByTagName("loaderConfig")[0]
+        registerTag = loaderConfigTag.getElementsByTagName("registry")[0]
+        
+        self.registry={}
+        keyTags = registerTag.getElementsByTagName("key") 
+        for keyTag in keyTags:
+            keyName = cs.grabAttribute(keyTag,"name")
+            keyValue =cs.grabAttribute(keyTag,"value")
+            self.registry[keyName]=keyValue
                 
+        xmldoc.unlink()
+        self.commandName=self.registry["commandName"]
+        self.currentWorkingDirectory=self.registry["currentWorkingDirectory"]
+
+
+        #Grab profile file
+        
+        self.profileFile = os.path.join(configRoot,"external_loaders", name, "profiles", "{0}.xml".format(profile))
+
+        xmldoc = xml.dom.minidom.parse(self.profileFile)
+        externalLoaderProfileTag = xmldoc.getElementsByTagName("externalLoaderProfile")
+        
+        if len(externalLoaderProfileTag) >0:
+            externalLoaderProfileTag = externalLoaderProfileTag[0]
+    
+            profileCommandName=cs.grabAttribute(externalLoaderProfileTag,"commandName")
+            if profileCommandName is not None:
+                self.commandName = profileCommandName 
+                
+            profileCurrentWorkingDirectory=cs.grabAttribute(externalLoaderProfileTag,"currentWorkingDirectory")
+            if profileCurrentWorkingDirectory is not None:
+                self.currentWorkingDirectory=profileCurrentWorkingDirectory
+            
+                        
             self.args=[]
-            argumentsTag = commandConfigTag.getElementsByTagName("arguments")
+            argumentsTag =  externalLoaderProfileTag.getElementsByTagName("arguments")
 
             if len(argumentsTag) >0:
                 argumentsTag = argumentsTag[0]

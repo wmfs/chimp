@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-  <gdalProfile>
+  <externalLoaderProfile>
     <arguments>
       <arg value="-f"/>                 
       <arg value='"PostgreSQL"'/>
@@ -32,10 +32,15 @@
       	  <placeholder variable="srid"/>
       	</placeholderContent>
       </arg>
-      	      
+      	
+      
+      <arg value="-preserve_fid"/>
+      
       <arg value="-append"/>
+
+	  <arg value="--config GML_EXPOSE_FID=YES GML_EXPOSE_GML_ID=YES"/>
            
     </arguments>
-  </gdalProfile>
+  </externalLoaderProfile>
   
   
