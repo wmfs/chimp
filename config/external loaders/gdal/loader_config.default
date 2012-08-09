@@ -1,0 +1,7 @@
+<loaderConfig>
+  <registry>
+ 	<key name="currentWorkingDirectory" value="C:/Program Files/GDAL/gdal-data"/>
+	<key name="commandName" value="C:/Program Files/GDAL/ogr2ogr"/>
+  </registry>
+</loaderConfig>
+	

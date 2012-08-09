@@ -1,17 +1,15 @@
 <?xml version="1.0"?>
-  <commandConfig currentWorkingDirectory="C:/Program Files/GDAL/gdal-data" commandName="C:/Program Files/GDAL/ogr2ogr">
-  <example a='ogr2ogr -f "PostgreSQL" PG:"host=localhost user=postgres dbname=gis password=postgres active_schema=stage" "D:\raw_data\OrdnanceSurvey\Mastermap\FULL\2010-04-27\65728-SJ2434-5i610.gz" -preserve_fid  -t_srs EPSG:27700 -s_srs EPSG:27700 -append"'/>
+  <gdalProfile>
     <arguments>
       <arg value="-f"/>                 
       <arg value='"PostgreSQL"'/>
       
-      <arg value='PG:"host=%s user=%s dbname=%s password=%s active_schema=%s"'>
+      <arg value='PG:"host=%s user=%s dbname=%s password=%s"'>
       	<placeholderContent>
       	  <placeholder variable="host"/>
       	  <placeholder variable="user"/>
       	  <placeholder variable="dbname"/>
       	  <placeholder variable="password"/>
-      	  <placeholder variable="schema"/>
       	</placeholderContent>
       </arg>
       
@@ -33,10 +31,16 @@
       	  <placeholder variable="srid"/>
       	</placeholderContent>
       </arg>
-      	      
+
+      <arg value="-nln %s">
+      	<placeholderContent>
+      	  <placeholder variable="newlayername"/>
+      	</placeholderContent>
+      </arg>
+                  	      
       <arg value="-append"/>
            
     </arguments>
-  </commandConfig>
+  </gdalProfile>
   
   
