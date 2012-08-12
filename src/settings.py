@@ -275,7 +275,7 @@ class Settings:
         self.appLogger.info("  securityLevels   : %s" %(str(self.securityLevels)))        
 
         if self.args.command != "tool" and len(self.extraArgs)>0:
-            raise Exception("Only 'tool' supports undefined arguments")
+            raise Exception("Unexpected arguments supplied ({0})".format(self.extraArgs))
             
         
         self.appLogger.info("  Zones")
