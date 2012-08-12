@@ -12,7 +12,7 @@ CREATE TABLE extract.extract_format_registry
 );
 
 CREATE TABLE extract.extract_history
-(extract_id PRIMARY KEY default nextval('extract.extract_seq'),
+(extract_id bigint PRIMARY KEY default nextval('extract.extract_seq'),
  specification_name character varying (30) not null,
  extract_format character varying (30) not null,
  extract_timestamp timestamp with time zone,
