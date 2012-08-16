@@ -243,12 +243,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
         id = record["id"]
         params.append(id)
 
-        #print(updateDml)
-        #print("")
-        test = "select id from mv.expanded_blpus where id=%s" 
         dataCursor.execute(updateDml, tuple(params))
-        
-        dataCursor.execute(test, (id,))
         dataCursor.execute(deleteFromQueue, (id,))
         
         successCount += 1
