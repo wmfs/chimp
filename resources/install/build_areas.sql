@@ -62,10 +62,14 @@ $BODY$
     v_point = ST_GeomFromText('POINT('||p_x||' '||p_y||')',27700);
     FOR i IN array_lower(v_area_names,1)..array_upper(v_area_names,1) LOOP
         v_sql := 'SELECT * FROM areas.get_points_' || v_area_names[i]||'($1)';
-	EXECUTE v_sql
-	INTO v_result
-	USING v_point;
-	RETURN NEXT v_result;    
+        BEGIN
+          EXECUTE v_sql
+          INTO v_result
+          USING v_point;
+          RETURN NEXT v_result;    
+        EXCEPTION when others then
+          null;
+        END;
       END LOOP;     
   END; 
 $BODY$
