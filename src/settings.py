@@ -198,26 +198,26 @@ class Settings:
         
         installParser = subParsers.add_parser("install", help="Install Chimp schemas")
         installParser.add_argument("--zones", action="store_true", help="S")
-        installParser.add_argument("--dbconnection", action="store", help="S")
+        installParser.add_argument("-d", "--dbconnection", action="store", help="S")
 
         buildParser = subParsers.add_parser("build", help="For generating scripts")
-        buildParser.add_argument("--specification", action="store", help="Specification for which scripts will be built")
+        buildParser.add_argument("-s", "--specification", action="store", help="Specification for which scripts will be built")
         buildParser.add_argument("--solrserver", action="store", help="Solr server for which scripts will be built")
-        buildParser.add_argument("--dbconnection", action="store", help="S")
+        buildParser.add_argument("-d", "--dbconnection", action="store", help="S")
         buildParser.add_argument("--install", action="store_true", help="S")
         buildParser.add_argument("--drop", action="store_true", help="S")
         buildParser.add_argument("--reinstall", action="store_true", help="S")
 
         stageParser = subParsers.add_parser("import", help="For staging, importing and absorbing external data")
         stageParser.add_argument("--streamname", action="store", default="normal", help="S")
-        stageParser.add_argument("--specification", action="store", help="Specification to import data into")
+        stageParser.add_argument("-s", "--specification", action="store", help="Specification to import data into")
         stageParser.add_argument("files", nargs="*", help="Defines individual files or groups")
         stageParser.add_argument("--limit", action="store", type=int, help="Limit records staged")
         stageParser.add_argument("--importmode", action="store", default="auto", choices=("auto","full","change","sync"), help="S")
         stageParser.add_argument("--tolerancelevel", action="store", default="error", choices=("none", "warning","error","exception"), help="S" )
         stageParser.add_argument("--commitfrequency", action="store", default="major", choices=("minor","major"), help="S" )
         stageParser.add_argument("--checkpointbehaviour", action="store", default="tolerate", choices=("tolerate", "commit","rollback"), help="S" )
-        stageParser.add_argument("--dbconnection", action="store", help="S")
+        stageParser.add_argument("-d", "--dbconnection", action="store", help="S")
         stageParser.add_argument("--deferprocessing", action="store_true", help="S")
         stageParser.add_argument("--recurse", action="store_true", help="Recurse directories")
         stageParser.add_argument("--filenameregex", action="store", help="Regular expression to help filter filenames")
@@ -229,10 +229,10 @@ class Settings:
         
         computeParser = subParsers.add_parser("compute", help="For refreshing things independently of any import")
         computeParser.add_argument("--streamname", action="store", default="normal", help="S")
-        computeParser.add_argument("--specificationrestriction", action="store", dest="specificationrestriction", help="Restrict computation to these [comma delimited] specifications")
+        computeParser.add_argument("-s", "--specificationrestriction", action="store", dest="specificationrestriction", help="Restrict computation to these [comma delimited] specifications")
         computeParser.add_argument("--restriction", action="store", help="A comma separated list of elements that should be calculated... [custom|ctree|pins|search]")
         computeParser.add_argument("--deferprocessing", action="store_true", help="S")
-        computeParser.add_argument("--dbconnection", action="store", help="S")
+        computeParser.add_argument("-d", "--dbconnection", action="store", help="S")
         computeParser.add_argument("--groupid", action="store", help="S")
         computeParser.add_argument("--tolerancelevel", action="store", default="error", choices=("none", "warning","error","exception"), help="S" )
         computeParser.add_argument("--commitfrequency", action="store", default="major", choices=("minor","major"), help="S" )
@@ -241,10 +241,10 @@ class Settings:
         queueParser = subParsers.add_parser("queue", help="For dealing with queue issues")        
         queueParser.add_argument("--action", action="store", choices=("clear","restart","stop"), help="Clear the queue")
         queueParser.add_argument("--streamname", action="store", default="normal", help="Stream name")
-        queueParser.add_argument("--dbconnection", action="store", help="S")
+        queueParser.add_argument("-d", "--dbconnection", action="store", help="S")
         
         cleanParser = subParsers.add_parser("clean", help="Drop all Chimp schemas")
-        cleanParser.add_argument("--dbconnection", action="store", help="S")
+        cleanParser.add_argument("-d", "--dbconnection", action="store", help="S")
         cleanParser.add_argument("--force", action="store_true", help="S")
         
         createParser = subParsers.add_parser("create", help="Create a Chimp entity")
@@ -253,7 +253,7 @@ class Settings:
         createParser.add_argument("--noexamples", action="store_true", help="When creating a new repository, exclude example specifications/Solr servers")
 
         extractParser = subParsers.add_parser("extract", help="Extract data out of Chimp")
-        extractParser.add_argument("--specification", action="store", help="Specification to import data from")
+        extractParser.add_argument("-s", "--specification", action="store", help="Specification to import data from")
         extractParser.add_argument("--format", help="Format that the extracted data should take")        
         extractParser.add_argument("--limit", action="store", help="Record limit of extracted output")
         
@@ -262,7 +262,7 @@ class Settings:
         toolParser = subParsers.add_parser("tool", help="Run one of the misc tools provided by Chimp")    
         toolParser.add_argument("--name", action="store", help="Name of tool")
         toolParser.add_argument("--profile", action="store", help="Some tools support the use of ready-made param profiles")
-        toolParser.add_argument("--dbconnection", action="store", help="Database connection (if appropriate)")
+        toolParser.add_argument("-d", "--dbconnection", action="store", help="Database connection (if appropriate)")
 
         args = parser.parse_known_args()
         self.args = args[0]    
