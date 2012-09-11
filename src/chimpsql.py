@@ -10,7 +10,7 @@ WORKING_SCHEMA = "working"
 HISTORY_SCHEMA = "history"
 IMPORT_SCHEMA = "import"
 EDITABLE_SCHEMA = "editable"
-
+ALERTS_SCHEMA = "alerts"
 
 
 
@@ -1089,112 +1089,115 @@ class SpecificationSQLBuilder:
                                                            ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getInputMappedFields()))))
 
     
-    def getStorageValidFunction(self, record, schemaName):
-        functionName = "{0}_valid".format(record.table)
-        delegateFunctionName = "{0}_valid".format(record.table)
-
-        if (schemaName == "import"):
-            forLoop = ("  FOR v_message IN SELECT * FROM {0}.{1} (\n"
-                       "    {2}").format(STAGE_SCHEMA, delegateFunctionName, 
-                                         ",\n    ".join(["p_" + field.column for field in record.getInputMappedFields()]))
-        else:
-            forLoop = ("  FOR v_message IN SELECT * FROM {0}.{1} (\n"
-                       "    {2}").format(IMPORT_SCHEMA, delegateFunctionName,
-                                         ",\n    ".join(["p_" + field.column for field in record.getAllMappedFields()]))
-
-        return Function(functionName, schemaName,
-                map(lambda field: field.columnDataType, record.getAllMappedFields()),
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                "  {2}\n"
-                ") RETURNS SETOF shared.chimp_message AS $$\n"
-                "DECLARE\n"       
-                "  v_message RECORD;\n"
-                "BEGIN\n"
-                "  --\n"
-                "  -- Example:\n"
-                "  -- \n"
-                "  -- IF p_my_column IS NULL THEN\n"
-                "  --   v_record.level = 'error';\n"
-                "  --   v_record.code = '1977';\n"
-                "  --   v_record.title = 'Value for ''My column'' must be specified';\n"
-                "  --   v_record.affected_columns = 'my_column';\n"
-                "  --   v_record.affected_row_count = 1;\n"
-                "  --   v_record.content = 'blah blah';\n"
-                "  --\n"
-                "  --   RETURN NEXT v_record;\n"
-                "  -- END IF;\n"
-                "  --\n\n"
-                "  --Check if passes import validation\n"
-                "{3}"
-                ") LOOP\n"
-                "    RETURN NEXT v_message;\n"
-                "  END LOOP;\n\n"
-                "END;\n"
-                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName,
-                                                   ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
-                                                   forLoop))
+#    def getStorageValidFunction(self, record, schemaName):
+#        functionName = "{0}_valid".format(record.table)
+#        delegateFunctionName = "{0}_valid".format(record.table)
+#
+#        if (schemaName == "import"):
+#            forLoop = ("  FOR v_message IN SELECT * FROM {0}.{1} (\n"
+#                       "    {2}").format(STAGE_SCHEMA, delegateFunctionName, 
+#                                         ",\n    ".join(["p_" + field.column for field in record.getInputMappedFields()]))
+#        else:
+#            forLoop = ("  FOR v_message IN SELECT * FROM {0}.{1} (\n"
+#                       "    {2}").format(IMPORT_SCHEMA, delegateFunctionName,
+#                                         ",\n    ".join(["p_" + field.column for field in record.getAllMappedFields()]))
+#
+#        return Function(functionName, schemaName,
+#                map(lambda field: field.columnDataType, record.getAllMappedFields()),
+#                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+#                "  {2}\n"
+#                ") RETURNS SETOF shared.chimp_message AS $$\n"
+#                "DECLARE\n"       
+#                "  v_message RECORD;\n"
+#                "BEGIN\n"
+#                "  --\n"
+#                "  -- Example:\n"
+#                "  -- \n"
+#                "  -- IF p_my_column IS NULL THEN\n"
+#                "  --   v_record.level = 'error';\n"
+#                "  --   v_record.code = '1977';\n"
+#                "  --   v_record.title = 'Value for ''My column'' must be specified';\n"
+#                "  --   v_record.affected_columns = 'my_column';\n"
+#                "  --   v_record.affected_row_count = 1;\n"
+#                "  --   v_record.content = 'blah blah';\n"
+#                "  --\n"
+#                "  --   RETURN NEXT v_record;\n"
+#                "  -- END IF;\n"
+#                "  --\n\n"
+#                "  --Check if passes import validation\n"
+#                "{3}"
+#                ") LOOP\n"
+#                "    RETURN NEXT v_message;\n"
+#                "  END LOOP;\n\n"
+#                "END;\n"
+#                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName,
+#                                                   ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
+#                                                   forLoop))
+#    
+#    def getStorageDeletableFunction(self, record, schemaName, storageTable):
+#        functionName = "{0}_deletable".format(record.table)   
+#        
+#        if schemaName == "editable":
+#            primaryKeyColumns = [SystemField("id", "bigint")]
+#        elif not record.hasPrimaryKey():
+#            primaryKeyColumns = [SystemField("id", "bigint")]
+#        elif len(record.primaryKeyColumns)==1 and record.primaryKeyColumns[0]=="id":
+#            primaryKeyColumns = [SystemField("id", "bigint")]                        
+#        else:
+#            primaryKeyColumns = record.getPrimaryKeyFields()
+#            
+#             
+##        primaryKeyColumns = [SystemField("id", "bigint")] if (schemaName == "editable" or not record.hasPrimaryKey()) else record.getPrimaryKeyFields()              
+#        
+#        
+#        body = ("SELECT exists(select true from {0}.{1} where {2}"             
+#                ")\n"
+#                "    INTO v_row_exists;\n"
+#                "    IF NOT v_row_exists THEN\n"                
+#                "      v_message.level = 'warning';\n"
+#                "      v_message.code = 'IMP002';\n"
+#                "      v_message.title = 'Unable to delete expected ''{0}.{1}'' record.';\n"
+#                "      v_message.affected_columns = NULL;\n"
+#                "      v_message.affected_row_count = 0;\n"
+#                "      v_message.content = 'Could not find a row with the primary key of';\n"
+#                "      {3}\n"
+#                "      RETURN NEXT v_message;\n"
+#                "    END IF;\n").format(schemaName, storageTable.name,
+#                                                   " AND ".join(map(lambda field: "{0} = p_{0}".format(field.column), primaryKeyColumns)),
+#                                                    "\n      ".join(map(lambda field: "v_message.content = v_message.content || ' ' || p_{0};".format(field.column), primaryKeyColumns)))
+#        
+#        return Function(functionName, schemaName,
+#                map(lambda field: field.columnDataType, primaryKeyColumns),
+#                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+#                "  {2}\n"
+#                ") RETURNS SETOF shared.chimp_message AS $$\n"
+#                "DECLARE\n"       
+#                "  v_message shared.chimp_message;\n"
+#                "  v_row_exists BOOLEAN;\n"
+#                "BEGIN\n"  
+#                "    {3}"
+#                "END;\n"
+#                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName, 
+#                                                   ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), primaryKeyColumns)),
+#                                                   body))
 
     
-    def getStorageDeletableFunction(self, record, schemaName, storageTable):
-        functionName = "{0}_deletable".format(record.table)   
-        
-        if schemaName == "editable":
-            primaryKeyColumns = [SystemField("id", "bigint")]
-        elif not record.hasPrimaryKey():
-            primaryKeyColumns = [SystemField("id", "bigint")]
-        elif len(record.primaryKeyColumns)==1 and record.primaryKeyColumns[0]=="id":
-            primaryKeyColumns = [SystemField("id", "bigint")]                        
-        else:
-            primaryKeyColumns = record.getPrimaryKeyFields()
-            
-             
-#        primaryKeyColumns = [SystemField("id", "bigint")] if (schemaName == "editable" or not record.hasPrimaryKey()) else record.getPrimaryKeyFields()              
-        
-        
-        body = ("SELECT exists(select true from {0}.{1} where {2}"             
-                ")\n"
-                "    INTO v_row_exists;\n"
-                "    IF NOT v_row_exists THEN\n"                
-                "      v_message.level = 'warning';\n"
-                "      v_message.code = 'IMP002';\n"
-                "      v_message.title = 'Unable to delete expected ''{0}.{1}'' record.';\n"
-                "      v_message.affected_columns = NULL;\n"
-                "      v_message.affected_row_count = 0;\n"
-                "      v_message.content = 'Could not find a row with the primary key of';\n"
-                "      {3}\n"
-                "      RETURN NEXT v_message;\n"
-                "    END IF;\n").format(schemaName, storageTable.name,
-                                                   " AND ".join(map(lambda field: "{0} = p_{0}".format(field.column), primaryKeyColumns)),
-                                                    "\n      ".join(map(lambda field: "v_message.content = v_message.content || ' ' || p_{0};".format(field.column), primaryKeyColumns)))
-        
-        return Function(functionName, schemaName,
-                map(lambda field: field.columnDataType, primaryKeyColumns),
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                "  {2}\n"
-                ") RETURNS SETOF shared.chimp_message AS $$\n"
-                "DECLARE\n"       
-                "  v_message shared.chimp_message;\n"
-                "  v_row_exists BOOLEAN;\n"
-                "BEGIN\n"  
-                "    {3}"
-                "END;\n"
-                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName, 
-                                                   ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), primaryKeyColumns)),
-                                                   body))
-
-    
-    def getStorageInsertFunction(self, record, schemaName, storageTable, storageValidFunction, duplicatePrimaryKeyBehaviour):
+    def getStorageInsertFunction(self, record, schemaName, storageTable, duplicatePrimaryKeyBehaviour):
         functionName = "{0}_insert".format(record.table)
         
         parameters = [SystemField("p_id", "bigint")]
         if schemaName == "import":
             parameters.append(SystemField("p_task_id", "integer"))
         if schemaName == "editable":
-            parameters.append(SystemField("p_source", "character varying"))            
+            parameters.append(SystemField("p_latest_source", "character varying"))            
         parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getAllMappedFields()]        
         if schemaName == record.getDestinationTargetSchema():
             parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]
 
+        if schemaName in record.alerts:
+            alertInjection = record.alerts[schemaName].getDmlInjection("insert")
+        else:
+            alertInjection = ""
 
         if duplicatePrimaryKeyBehaviour == "ignore":
             duplicateClause = ("  WHEN unique_violation THEN\n"
@@ -1203,136 +1206,187 @@ class SpecificationSQLBuilder:
             duplicateClause = ("  WHEN unique_violation THEN\n"
                                "    v_message = shared.make_{0}('IMP006','Could not insert, duplicate primary key',NULL,1,SQLERRM);\n"
                                "    RETURN NEXT v_message;\n".format(duplicatePrimaryKeyBehaviour))
+
         
-        
-        return Function(functionName, schemaName,
-                [field.typeName for field in parameters],
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                "  {2}\n"
-                ") RETURNS SETOF shared.chimp_message AS $$\n"
-                "DECLARE\n"
-                "  v_perform_insert boolean;\n"
-                "  v_message record;\n"
-                "BEGIN\n"
-                "  v_perform_insert = TRUE;\n"
-                "  FOR v_message IN SELECT * FROM {3}.{4}(\n"
-                "    {5}\n"
-                ") LOOP\n"
-                "    IF v_message.level in('error','exception') THEN\n"
-                "      v_perform_insert = FALSE;\n"
-                "    END IF;\n"
-                "    RETURN NEXT v_message;\n"
-                "  END LOOP;\n"
-                "  IF v_perform_insert THEN\n"
-                "    INSERT INTO {6}.{7} (\n"
-                "     id{8}{9}{10}{11}\n" 
-                ")\n"
-                "    VALUES (\n"
-                "     p_id{12}{13}{14}{15}\n"
-                ");\n" 
-                "  END IF;\n"
-                "EXCEPTION\n{16}"
-                "  WHEN others THEN\n"
-                "    v_message = shared.make_exception('IMP005','Unhandled exception while inserting',NULL,1,SQLERRM);\n"
-                "    RETURN NEXT v_message;\n"
-                "END;\n"
-                "$$ LANGUAGE plpgsql;\n\n").format(                                                                                                      
+        sql = ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+               "  {2}\n"
+               ") RETURNS SETOF shared.chimp_message AS $$\n"
+               "DECLARE\n"
+               "  v_perform_insert boolean := TRUE;\n"
+               "  v_message record;\n"               
+               "BEGIN\n{3}"               
+               "  IF v_perform_insert THEN\n"
+               "    INSERT INTO {4}.{5} (\n"
+               "     id{6}{7}{8}{9})\n" 
+               "    VALUES (\n"
+               "     p_id{10}{11}{12}{13});\n"
+               "  END IF;\n"
+               "EXCEPTION\n{14}"
+               "  WHEN others THEN\n"
+               "    v_message = shared.make_exception('IMP005','Unhandled exception while inserting',NULL,1,SQLERRM);\n"
+               "    RETURN NEXT v_message;\n"
+               "END;\n"
+               "$$ LANGUAGE plpgsql;\n\n").format(                                                                                                      
                            schemaName, #0 
                            functionName, #1
                            ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]), #2
-                           storageValidFunction.schema, #3 
-                           storageValidFunction.name, #4
-                           ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())), #5
-                           storageTable.schema, #6
-                           storageTable.name, #7                      
-                           "" if schemaName != "editable" else ",\n     original_source,\n     latest_source", #8
-                           "".join(map(lambda field: ",\n     {0}".format(field.column), record.getAllMappedFields())), #9
-                           "" if schemaName != "import" else ",\n     last_affirmed_task_id,\n     created_task_id,\n     modified_task_id", #10
-                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     visibility,\n     security", #11        
-                           "" if schemaName != "editable" else ",\n     p_source,\n     p_source", #12
-                           "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())), #13
-                           "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id", #14
-                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security", #15
-                           duplicateClause #16
-                           ))    
+                           alertInjection, #storageValidFunction.schema, #3 
+                           storageTable.schema, #4
+                           storageTable.name, #5                    
+                           "" if schemaName != "editable" else ",\n     original_source,\n     latest_source", #6
+                           "".join(map(lambda field: ",\n     {0}".format(field.column), record.getAllMappedFields())), #7
+                           "" if schemaName != "import" else ",\n     last_affirmed_task_id,\n     created_task_id,\n     modified_task_id", #8
+                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     visibility,\n     security", #9
+                           "" if schemaName != "editable" else ",\n     p_latest_source,\n     p_latest_source", #10
+                           "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())), #11
+                           "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id", #12
+                           "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security", #13
+                           duplicateClause) #14
+               
+                       
+        return Function(functionName, schemaName, [field.typeName for field in parameters], sql)    
     
-    def getStorageUpdateFunction(self, record, schemaName, storageTable, storageValidFunction, whenNoDataFoundBehaviour):
-        functionName = "{0}_update".format(record.table)
+    def getStorageUpsertFunction(self, mode, record, schemaName, storageTable, whenNoDataFoundBehaviour):
+
+        if mode=="update":
+            actionVerb = "updating"
+        elif mode=="merge":
+            actionVerb = "merging"
+            
+        functionName = "{0}_{1}".format(record.table, mode)
         
         parameters = []
         if schemaName == "import":
             parameters.append(SystemField("p_task_id", "integer"))
         else:
-            parameters += [SystemField("p_id", "bigint"), SystemField("p_source", "character varying")]
+            parameters += [SystemField("p_id", "bigint"), SystemField("p_latest_source", "character varying")]
         parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getAllMappedFields()]    
         if schemaName == record.getDestinationTargetSchema():
             parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]        
 
-        # How to deal with a row that's not there?
-        if whenNoDataFoundBehaviour in("notice","warning","error","exception"):
-            missingRowClause = ("    GET DIAGNOSTICS v_count = ROW_COUNT;\n"               
-                                "    IF v_count = 0 THEN\n"
-                                "      v_message.level = '{0}';\n"
-                                "      v_message.code = 'IMP001';\n"
-                                "      v_message.title = 'Unable to update expected ''{1}.{2}'' record.';\n"
-                                "      v_message.affected_columns = NULL;\n"
-                                "      v_message.affected_row_count = 0;\n"
-                                "      v_message.content = 'Could not find a row with the primary key of';\n"
-                                "      {3}\n"
-                                "      RETURN NEXT v_message;\n"
-                                "    END IF;\n".format(whenNoDataFoundBehaviour, #0
-                                                       storageTable.schema, #1
-                                                       storageTable.name, #2
-                                                       "\n      ".join(map("v_message.content = v_message.content || ' ' || p_{0};".format, record.primaryKeyColumns)))) #3
+
+#        # How to deal with a row that's not there?
+#        if whenNoDataFoundBehaviour in("notice","warning","error","exception"):
+#            missingRowClause = ("    GET DIAGNOSTICS v_count = ROW_COUNT;\n"               
+#                                "    IF v_count = 0 THEN\n"
+#                                "      v_message.level = '{0}';\n"
+#                                "      v_message.code = 'IMP001';\n"
+#                                "      v_message.title = 'Unable to update expected ''{1}.{2}'' record.';\n"
+#                                "      v_message.affected_columns = NULL;\n"
+#                                "      v_message.affected_row_count = 0;\n"
+#                                "      v_message.content = 'Could not find a row with the primary key of';\n"
+#                                "      {3}\n"
+#                                "      RETURN NEXT v_message;\n"
+#                                "    END IF;\n".format(whenNoDataFoundBehaviour, #0
+#                                                       storageTable.schema, #1
+#                                                       storageTable.name, #2
+#                                                       "\n      ".join(map("v_message.content = v_message.content || ' ' || p_{0};".format, record.primaryKeyColumns)))) #3
 
                         
-        return Function(functionName, schemaName, 
-                [field.typeName for field in parameters],
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                 "  {2}\n"
-                 ") RETURNS SETOF shared.chimp_message AS $$\n"
-                 "DECLARE\n"
-                 "  v_count INTEGER;\n"
-                 "  v_perform_update boolean;\n"
-                 "  v_message shared.chimp_message;\n"
-                 "BEGIN\n"
-                 "  v_perform_update = TRUE;\n"
-                 "  FOR v_message IN SELECT * FROM {3}.{4}(\n"
-                 "    {5}\n"
-                 ") LOOP\n"
-                 "    IF v_message.level in('error','exception') THEN\n"
-                 "      v_perform_update = FALSE;\n"
-                 "    END IF;\n"
-                 "    RETURN NEXT v_message;\n"
-                 "  END LOOP;\n"
-                 "  IF v_perform_update THEN\n"
-                 "    UPDATE {6}.{7} SET\n"
-                 "      {8},\n"
-                 "      {9}{10}\n"
-                 "    WHERE {11};\n\n"
-                 "  END IF;\n{12}"
-                 "EXCEPTION\n"
-                 "  WHEN others THEN\n"
-                 "    v_message = shared.make_exception('IMP006','Unhandled exception while updating',NULL,1,SQLERRM);\n"
-                 "    RETURN NEXT v_message;\n"
-                 "END;\n"
-                 "$$ LANGUAGE plpgsql;\n\n").format(
-                            schemaName, #0 
-                            functionName, #1
-                            ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]), #2                            
-                            storageValidFunction.schema, #3 
-                            storageValidFunction.name, #4
-                            ",\n    ".join(map(lambda field: "p_{0}".format(field.column), record.getAllMappedFields())), #5
-                            storageTable.schema, #6
-                            storageTable.name, #7                          
-                            "last_affirmed = now(),\n      last_affirmed_task_id = p_task_id" if schemaName == "import" else "latest_source = p_source", #8
-                            ",\n      ".join(map(lambda field: "{0} = p_{0}".format(field.column), record.getAllMappedFields())), #9
-                            "" if schemaName != record.getDestinationTargetSchema() else ",\n      visibility = p_visibility,\n      security = p_security", #10
-                            "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns)), #11
-                            missingRowClause)) #12         
+        sql =  ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+                "  {2}\n"
+                ") RETURNS SETOF shared.chimp_message AS $$\n"
+                "DECLARE\n"
+                "  v_count INTEGER;\n"
+                "  v_perform_{3} boolean;\n"
+                "  v_message shared.chimp_message;\n").format(schemaName, #0
+                                                              functionName, #1
+                                                              ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]), #2
+                                                              mode) #3
+
+        if schemaName in record.alerts or mode=="merge":
+            sql += "  v_old_record record;\n"
+
+                
+        if schemaName in record.alerts:
+            alertInjection = record.alerts[schemaName].getDmlInjection(mode)
+            #sql += "  v_old_record {0}.all_{1}_{2}_params;\n".format(ALERTS_SCHEMA, schemaName, record.table)
+
+            additionalExceptions = ("  WHEN NO_DATA_FOUND THEN\n"
+                                    "    v_message = ('{0}','NODATA','Unable to {3} expected ''{1}.{2}'' record.',NULL,0,'Could not find a row with id '||p_id::character varying);\n"
+                                    "    RETURN NEXT v_message;\n".format(whenNoDataFoundBehaviour, #0
+                                                                          storageTable.schema, #1
+                                                                          storageTable.name, #2
+                                                                          mode)) #3 
+
+        else:
+            alertInjection = ""
+            additionalExceptions = ""
+            
+         
+
+        if mode=="merge":
+            if schemaName in record.alerts:
+                insertAlertInjection = record.alerts[schemaName].getDmlInjection("insert",flagVariableOverride="v_perform_merge")
+            else:
+                insertAlertInjection = ""
+
+            mergeWrapUp = ("\nELSE\n"
+                           "  -- No record, so do an insert instead\n{0}"
+                           "  IF v_perform_merge THEN\n"
+                           "    INSERT INTO {1}.{2} (\n"
+                           "     id{3}{4}{5}{6})\n" 
+                           "    VALUES (\n"
+                           "     p_id{7}{8}{9}{10});\n"                           
+                           "  END IF;\n"
+                           "END IF;\n").format(insertAlertInjection, #0
+                                               storageTable.schema, #1
+                                               storageTable.name, #2                    
+                                               "" if schemaName != "editable" else ",\n     original_source,\n     latest_source", #3
+                                               "".join(map(lambda field: ",\n     {0}".format(field.column), record.getAllMappedFields())), #4
+                                               "" if schemaName != "import" else ",\n     last_affirmed_task_id,\n     created_task_id,\n     modified_task_id", #5
+                                               "" if schemaName != record.getDestinationTargetSchema() else ",\n     visibility,\n     security", #6
+                                               "" if schemaName != "editable" else ",\n     p_latest_source,\n     p_latest_source", #7
+                                               "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())), #8
+                                               "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id", #9
+                                               "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security") #10
+        else:
+            mergeWrapUp=""
+
+        
+        sql += "BEGIN\n"
+        
+        
+        if mode=="merge" and schemaName not in record.alerts:
+            sql += ("\n  SELECT {0}\n"
+                    "  INTO v_old_record\n"
+                    "  FROM {1}.{2}\n"
+                    "  WHERE {3};\n"
+                    "\nIF v_old_record IS NOT NULL THEN\n").format(",".join(map(lambda x:x.column, record.getAllMappedFields())), #0
+                                                                   schemaName,#1
+                                                                   record.table,#2
+                                                                   "id = p_id" if schemaName == "editable" else " AND ".join(map(lambda x:"{0} = p_{0}".format(x), record.primaryKeyColumns)))
+
+        
+                
+        sql += ("  v_perform_{8} = TRUE;{0}\n"
+                "  IF v_perform_{8} THEN\n"
+                "    UPDATE {1}.{2} SET\n"
+                "      {3},\n"
+                "      {4}{5}\n"
+                "    WHERE {6};\n"
+                "  END IF;\n{10}\n"
+                "EXCEPTION\n{7}"
+                "  WHEN others THEN\n"
+                "    v_message = shared.make_exception('IMP006','Unhandled exception while {9}',NULL,1,SQLERRM);\n"
+                "    RETURN NEXT v_message;\n"
+                "END;\n"
+                "$$ LANGUAGE plpgsql;\n\n".format(alertInjection, #0                                                                            
+                                                  storageTable.schema, #1
+                                                  storageTable.name, #2                     
+                                                  "last_affirmed = now(),\n      last_affirmed_task_id = p_task_id" if schemaName == "import" else "latest_source = p_latest_source", #3
+                                                  ",\n      ".join(map(lambda field: "{0} = p_{0}".format(field.column), record.getAllMappedFields())), #4
+                                                  "" if schemaName != record.getDestinationTargetSchema() else ",\n      visibility = p_visibility,\n      security = p_security", #5
+                                                  "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns)), #6
+                                                  additionalExceptions, #7
+                                                  mode, #8
+                                                  actionVerb, #9
+                                                  mergeWrapUp)) #10
+                 
+        return Function(functionName, schemaName, [field.typeName for field in parameters],sql)          
 
     
-    def getStorageDeleteFunction(self, record, schemaName, storageTable, storageDeletableFunction):
+    def getStorageDeleteFunction(self, record, schemaName, storageTable, whenNoDataFoundBehaviour):
         functionName = "{0}_delete".format(record.table)   
         
         parameters = []
@@ -1341,43 +1395,70 @@ class SpecificationSQLBuilder:
         else:
             parameters.append(SystemField("p_task_id", "integer"))
             parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getPrimaryKeyFields()]
+
+
+        sql = ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+               "  {2}\n"
+               ") RETURNS SETOF shared.chimp_message AS $$\n"                
+               "DECLARE\n"
+               "  v_perform_delete boolean;\n"
+               "  v_message record;\n"
+               "  v_result shared.chimp_message;\n".format(schemaName,
+                                                           functionName,
+                                                           ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters])))                                                                    
+
+        
+        if schemaName in record.alerts:
+            alertInjection = record.alerts[schemaName].getDmlInjection("delete")
+            sql += "  v_old_record record;\n"
+            additionalExceptions = ("  WHEN NO_DATA_FOUND THEN\n"
+                                    "    v_result = ('{0}','NODATA','Unable to delete expected ''{1}.{2}'' record.',NULL,0,'Could not find a row with id '||p_id::character varying);\n"
+                                    "    RETURN NEXT v_result;\n".format(whenNoDataFoundBehaviour, #0
+                                                                          storageTable.schema, #1
+                                                                          storageTable.name)) #2 
+                                    
+# ("level" character varying(30),
+#    code character varying(30),
+#    title character varying(200),
+#    affected_columns character varying(2000),
+#    affected_row_count integer,
+#    "content" character varying(4000));                                    
+#                                    
+#                                    
+#                                    "    v_message.level = '{0}';\n"
+#                                    "    v_message.code = 'NODATA';\n"
+#                                    "    v_message.title = 'Unable to delete expected ''{1}.{2}'' record.';\n"
+#                                    "    v_message.affected_columns = NULL;\n"
+#                                    "    v_message.affected_row_count = 0;\n"
+#                                    "    v_message.content = 'Could not find a row with id '||p_id::character varying;\n"
+#                                    "    RETURN NEXT v_message;\n".format(whenNoDataFoundBehaviour, #0
+#                                                                          storageTable.schema, #1
+#                                                                           storageTable.name)) #3
+
+        else:
+            alertInjection = ""
+            additionalExceptions = ""
+
+        
+        sql+= ("BEGIN\n"
+               "  v_perform_delete = TRUE;\n{0}"
+               "  IF v_perform_delete THEN\n"                               
+               "    DELETE FROM {1}.{2}\n"
+               "    WHERE {3};\n"
+               "  END IF;\n"  
+               "EXCEPTION\n{4}"
+               "  WHEN others THEN\n"
+               "    v_message = shared.make_exception('IMP007','Unhandled exception while deleting',NULL,1,SQLERRM);\n"
+               "    RETURN NEXT v_message;\n"                
+               "END;\n"
+               "$$ LANGUAGE plpgsql;\n\n".format(alertInjection, #0
+                                                 storageTable.schema, #1
+                                                 storageTable.name, #2
+                                                 "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns)),
+                                                 additionalExceptions)) #3       
                                
         return Function(functionName, schemaName, 
-                [field.typeName for field in parameters],
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                "  {2}\n"
-                ") RETURNS SETOF shared.chimp_message AS $$\n"                
-                "DECLARE\n"
-                "  v_perform_delete boolean;\n"
-                "  v_message record;\n"
-                "  v_result shared.chimp_message;\n"                                                                    
-                "BEGIN\n"
-                "  v_perform_delete = TRUE;\n"
-                "  FOR v_message IN SELECT * FROM {3}.{4}(\n"
-                "    {5}\n"
-                ") LOOP\n"
-                "    IF v_message.level in('error','exception') THEN\n"
-                "      v_perform_delete = FALSE;\n"
-                "    END IF;\n"
-                "    RETURN NEXT v_message;\n"
-                "  END LOOP;\n\n"
-                "  IF v_perform_delete THEN\n"                                
-                "    DELETE FROM {6}.{7}\n"
-                "    WHERE {8};\n"
-                "  END IF;\n"  
-                "EXCEPTION\n"
-                "  WHEN others THEN\n"
-                "    v_message = shared.make_exception('IMP007','Unhandled exception while deleting',NULL,1,SQLERRM);\n"
-                "    RETURN NEXT v_message;\n"                
-                "END;\n"
-                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName,
-#                           "p_id bigint" if schemaName == "export" else ("  p_task_id integer" +
-#                                    "".join(map(lambda field: ",\n  p_{0} {1}".format(field.column, field.columnDataType), record.getPrimaryKeyFields()))),
-                            ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]),
-                            storageDeletableFunction.schema, storageDeletableFunction.name,
-                            ",\n    ".join(["p_" + col for col in record.primaryKeyColumns]),
-                            storageTable.schema, storageTable.name,
-                            "id = p_id" if (schemaName == "editable" or not record.hasPrimaryKey()) else " AND ".join(map("{0} = p_{0}".format, record.primaryKeyColumns))))       
+                [field.typeName for field in parameters],sql)       
 
     
     def getStorageMergeFunction(self, record, schemaName, storageTable, storageInsertFunction, storageUpdateFunction):

@@ -410,53 +410,53 @@ def makePostgreSQLBuildScript(settings, version):
 #                                registerAndWrite(sqlBuilder.createStorageEntityTimestampIndex(table, entity, record, schemaName, storageTable), objectRegistry, file)                                   
                
                 # Build validation scripts:
-                # First up the "CORE" validation
-                # This will go in the "stage" schema (the if is so it only builds once)
-                # =====================================================================
-                
-                if schemaName == "import":                
-                    validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), "stage", "{0}_stage_validation_function.sql".format(record.table))                
-                    with open(validationScriptFilename, "w") as functionFile:
-                        stageValidFunction = sqlBuilder.getStageValidFunction(record)
-                        registerAndWrite(stageValidFunction, objectRegistry, functionFile)
-                                                                        
-                    file.write("-- Incorporate validation function")
-                    file.write("\n\\i '%s'\n" %(validationScriptFilename.replace("\\","/")))
-
-                validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), schemaName, "{0}_import_validation_function.sql".format(record.table))
-                with open(validationScriptFilename, "w") as functionFile:
-                    storageValidFunction = sqlBuilder.getStorageValidFunction(record, schemaName)
-                    registerAndWrite(storageValidFunction, objectRegistry, functionFile)
-                                    
-                file.write("-- Incorporate validation function")
-                file.write("\n\\i '%s'\n\n" %(validationScriptFilename.replace("\\","/")))
-
-                validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), schemaName, "{0}_import_deletable_function.sql".format(record.table))
-                with open(validationScriptFilename, "w") as functionFile:
-                    storageDeletableFunction = sqlBuilder.getStorageDeletableFunction(record, schemaName, storageTable)
-                    registerAndWrite(storageDeletableFunction, objectRegistry, functionFile)
-                    
-                file.write("-- Incorporate validation function")
-                file.write("\n\\i '%s'\n\n" %(validationScriptFilename.replace("\\","/")))
-
+#                # First up the "CORE" validation
+#                # This will go in the "stage" schema (the if is so it only builds once)
+#                # =====================================================================
+#                
+#                if schemaName == "import":                
+#                    validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), "stage", "{0}_stage_validation_function.sql".format(record.table))                
+#                    with open(validationScriptFilename, "w") as functionFile:
+#                        stageValidFunction = sqlBuilder.getStageValidFunction(record)
+#                        registerAndWrite(stageValidFunction, objectRegistry, functionFile)
+#                                                                        
+#                    file.write("-- Incorporate validation function")
+#                    file.write("\n\\i '%s'\n" %(validationScriptFilename.replace("\\","/")))
+#
+#                validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), schemaName, "{0}_import_validation_function.sql".format(record.table))
+#                with open(validationScriptFilename, "w") as functionFile:
+#                    storageValidFunction = sqlBuilder.getStorageValidFunction(record, schemaName)
+#                    registerAndWrite(storageValidFunction, objectRegistry, functionFile)
+#                                    
+#                file.write("-- Incorporate validation function")
+#                file.write("\n\\i '%s'\n\n" %(validationScriptFilename.replace("\\","/")))
+#
+#                validationScriptFilename = os.path.join(settings.paths["generatedValidationSQLScriptsDir"].format(specification.name), schemaName, "{0}_import_deletable_function.sql".format(record.table))
+#                with open(validationScriptFilename, "w") as functionFile:
+#                    storageDeletableFunction = sqlBuilder.getStorageDeletableFunction(record, schemaName, storageTable)
+#                    registerAndWrite(storageDeletableFunction, objectRegistry, functionFile)
+#                    
+#                file.write("-- Incorporate validation function")
+#                file.write("\n\\i '%s'\n\n" %(validationScriptFilename.replace("\\","/")))
+#
                 # INSERT
                 # ======                                                                    
-                storageInsertFunction = sqlBuilder.getStorageInsertFunction(record, schemaName, storageTable, storageValidFunction, settings.env["defaultDuplicateKeyBehaviour"])
+                storageInsertFunction = sqlBuilder.getStorageInsertFunction(record, schemaName, storageTable, settings.env["defaultDuplicateKeyBehaviour"])
                 registerAndWrite(storageInsertFunction, objectRegistry, file)
 
                 # UPDATE
                 # ======
-                storageUpdateFunction = sqlBuilder.getStorageUpdateFunction(record, schemaName, storageTable, storageValidFunction,settings.env["defaultNoDataFoundBehaviour"])
+                storageUpdateFunction = sqlBuilder.getStorageUpsertFunction("update", record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
                 registerAndWrite(storageUpdateFunction, objectRegistry, file)
 
                 # DELETE
                 # ======
-                storageDeleteFunction = sqlBuilder.getStorageDeleteFunction(record, schemaName, storageTable, storageDeletableFunction)
+                storageDeleteFunction = sqlBuilder.getStorageDeleteFunction(record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
                 registerAndWrite(storageDeleteFunction, objectRegistry, file)
                 
                 # MERGE 
                 # =====
-                storageMergeFunction = sqlBuilder.getStorageMergeFunction(record, schemaName, storageTable, storageInsertFunction, storageUpdateFunction)
+                storageMergeFunction = sqlBuilder.getStorageUpsertFunction("merge", record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
                 registerAndWrite(storageMergeFunction, objectRegistry, file)
                 
                 # BUILD IMPORT TRANSFORMATION SCRIPTS
@@ -663,8 +663,42 @@ def makePostgreSQLBuildScript(settings, version):
             registerAndWrite(sqlBuilder.getWorkingRemoteUpdateRule(record, workingView), objectRegistry, file)
             registerAndWrite(sqlBuilder.getWorkingRemoteDeleteRule(record, workingView), objectRegistry, file)
    
-
-                          
+    def buildAlerts():
+        firstAlertingRecord=True
+        for record in specification.getUsefulRecords():
+            for schema in record.alerts:  
+                alert = record.alerts[schema]
+                if firstAlertingRecord:
+                    sequence = alert.getSpecSequence()
+                    registerAndWrite(sequence, objectRegistry, file)
+                    firstAlertingRecord = False
+                table = alert.getRegistryTable(sequence)
+                registerAndWrite(table, objectRegistry, file)
+                registerAndWrite(alert.getRegistryPkIndex(table), objectRegistry, file)
+                
+                alertTable = alert.getAlertTable(sequence)
+                registerAndWrite(alertTable, objectRegistry, file)
+                            
+                registerAndWrite(alert.getAlertRecordIdIndex(alertTable), objectRegistry, file)
+                registerAndWrite(alert.getAlertPkIndex(alertTable), objectRegistry, file)
+                
+                registerAndWrite(alert.getRegistryEnabledIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryOnInsertIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryOnUpdateIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryOnDeleteIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryStageIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryImportIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryEditableIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegistryMvIndex(table), objectRegistry, file)
+                registerAndWrite(alert.getRegisterFunction(table, sequence), objectRegistry, file)
+                type =alert.getParamType()
+                registerAndWrite(type, objectRegistry, file)
+                
+                for dmlEvent in ["insert", "update", "delete"]:                                
+                    generatorFunction = alert.getGeneratorFunction(schema, table, type, dmlEvent)
+                    registerAndWrite(generatorFunction, objectRegistry, file)
+           
+                                          
     file=open(settings.paths["buildSQLFile"].format(specification.name), "w")    
     appLogger.info("Vendor : PostgreSQL")
     appLogger.info("Version: "+str(version))
@@ -680,15 +714,17 @@ def makePostgreSQLBuildScript(settings, version):
     
         
     buildSharedSchema()
-    buildOptionSets()
+    buildOptionSets()   
     buildStageSchema()
     buildImportSchema()  
     buildEditableSchema()
+    buildAlerts()
     buildPublicationObjects()    
     buildVcSchema()
-    buildWorkingSchema()        
+    buildWorkingSchema()         
     buildIndexScripts()    
     buildDropScript()
+    
     
     # Finish up
     file.close()

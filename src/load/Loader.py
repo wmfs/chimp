@@ -390,32 +390,31 @@ class Loader:
                 messages = dataCursor.fetchall()
             
             success=True
-#                    for thisMessage in messages:
-#                            msgLevel = thisMessage[0]
-#                        msgCode = thisMessage[1]
-#                        msgTitle = thisMessage[2]
-#                        msgAffectedColumns = thisMessage[3]
-#                        msgAffectedRowCount = thisMessage[4]
-#                        msgContent = thisMessage[5]
-#
-#                        self.queue.addTaskMessage(taskId, thisRecord.table, lineCount, msgLevel, msgCode, msgTitle, msgAffectedColumns, msgAffectedRowCount, "{0}: {1}".format(msgContent,transformedValues))
-#
-#                        if msgLevel=="warning":
-#                            warningCount += 1
-#                            success=False
-#                        elif msgLevel=="error":
-#                            errorCount += 1
-#                            success=False
-#                        elif msgLevel=="exception":
-#                            exceptionCount += 1
-#                            success=False     
-#                        elif msgLevel=="notice":
-#                            noticeCount += 1
+            for thisMessage in messages:
+                msgLevel = thisMessage[0]
+                msgCode = thisMessage[1]
+                msgTitle = thisMessage[2]
+                msgAffectedColumns = thisMessage[3]
+                msgAffectedRowCount = thisMessage[4]
+                msgContent = thisMessage[5]
 
-#                    if success:                       
-            successCount = successCount + 1
+                self.queue.addTaskMessage(taskId, thisRecord.table, lineCount, msgLevel, msgCode, msgTitle, msgAffectedColumns, msgAffectedRowCount, "{0}: {1}".format(msgContent,transformedValues))
+
+                if msgLevel=="warning":
+                    warningCount += 1
+                    success=False
+                elif msgLevel=="error":
+                    errorCount += 1
+                    success=False
+                elif msgLevel=="exception":
+                    exceptionCount += 1
+                    success=False     
+                elif msgLevel=="notice":
+                    noticeCount += 1
+            
+            if success:                       
+                successCount = successCount + 1
         
-#               loopCursor.commit()
         loopCursor.close()
     
         return( (successCount, exceptionCount, errorCount, warningCount, ignoredCount, noticeCount) )

@@ -182,32 +182,32 @@ class Stager:
         importData = self.transformFunctions[thisRecord.table](self.dataCursor, importData)
         
         # VALIDATE
-        self.dataCursor.execute(thisRecord.validationCall, importData)
-        messages = self.dataCursor.fetchall()
+        #self.dataCursor.execute(thisRecord.validationCall, importData)
+        #messages = self.dataCursor.fetchall()
         messagesFound = False
         raisedWarning = False
         raisedError = False                
         raisedException=False
         
-        for thisMessage in messages:
-            messagesFound = True
-            messageLevel = thisMessage[0]
-            messageCode = thisMessage[1]
-            messageTitle = thisMessage[2]
-            messageAffectedColumns = thisMessage[3]
-            messageAffectedRowCount = thisMessage[4]
-            messageContent = "{0}\n\nOriginal line:\n{1}".format(thisMessage[5], importData)
-            messageComponents = (self.taskId, thisRecord.table, self.lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent)
-            self.dataCursor.execute(self.messageSql, (self.taskId, thisRecord.table, self.lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent))
-
-            if messageLevel=="warning":
-                raisedWarning = True
-            elif messageLevel=="error":
-                raisedError = True
-            elif messageLevel=="exception":
-                raisedException = True     
-            elif messageLevel=="notice":
-                self.noticeCount = self.noticeCount + 1
+#        for thisMessage in messages:
+#            messagesFound = True
+#            messageLevel = thisMessage[0]
+#            messageCode = thisMessage[1]
+#            messageTitle = thisMessage[2]
+#            messageAffectedColumns = thisMessage[3]
+#            messageAffectedRowCount = thisMessage[4]
+#            messageContent = "{0}\n\nOriginal line:\n{1}".format(thisMessage[5], importData)
+#            messageComponents = (self.taskId, thisRecord.table, self.lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent)
+#            self.dataCursor.execute(self.messageSql, (self.taskId, thisRecord.table, self.lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent))
+#
+#            if messageLevel=="warning":
+#                raisedWarning = True
+#            elif messageLevel=="error":
+#                raisedError = True
+#            elif messageLevel=="exception":
+#                raisedException = True     
+#            elif messageLevel=="notice":
+#                self.noticeCount = self.noticeCount + 1
         
         # Add extra columns for stage statement
         importData.insert(0,self.taskId)

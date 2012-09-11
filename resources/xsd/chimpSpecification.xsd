@@ -8,96 +8,119 @@
     
 
     <complexType name="specificationType">
-        <annotation>
-        	<documentation></documentation>
-        </annotation>
-        <sequence>
-        	<element name="stageConfig" type="tns:stageConfigType"
-        		maxOccurs="1" minOccurs="0">
-        		<annotation>
-        			<documentation>
-        				Controls how Chimp should store the data
-        				initally extracted from raw files.
-        			</documentation>
-        		</annotation>
-        	</element>
-        	<element name="source" type="tns:sourceType" maxOccurs="1"
-        		minOccurs="1">
-        		<annotation>
-        			<documentation>
-        				Describes the data source from which Chimp will
-        				extract the raw data from.
-        			</documentation>
-        		</annotation>
-        	</element>
-        	<element name="identification" type="tns:identificationType"
-        		maxOccurs="1" minOccurs="0">
-        		<annotation>
-        			<documentation>
-        				For identifying files as either 'ful' or
-        				'change' by means of regular expressions.
-        				Decided as part of the file scan process, note
-        				that the last line matching either of the
-        				regular expressions will win. Ideally there will
-        				be only one line in the whole file that matches
-        				either of these regular expressions.
-        			</documentation>
-        		</annotation>
-        	</element>
-            <element name="behaviour" type="tns:behaviourType" maxOccurs="1" minOccurs="0">
+    	<annotation>
+    		<documentation></documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="stageConfig" type="tns:stageConfigType"
+    			maxOccurs="1" minOccurs="0">
     			<annotation>
-    				<documentation>Controls how certain functions of Chimp should behave given a certain set of circumstances.</documentation>
-    			</annotation></element>
-            <element name="record" type="tns:recordType"
-        		maxOccurs="unbounded" minOccurs="1">
-        		<annotation>
-        			<documentation>
-        				Specifications are made from one or more
-        				records. Different record types can be
-        				identified by regular expressions... this
-        				feature allows for support of 'jagged' .csv
-        				files. Usually records map to a database table,
-        				though it is possible to instruct Chimp that a
-        				record is not 'useful', and that Chimp need not
-        				create database objects to store any data for
-        				it.
-        			</documentation>
-        		</annotation>
-        	</element>
-        	<element name="entity" type="tns:entityType"
-        		maxOccurs="unbounded" minOccurs="0">
-        		<annotation>
-        			<documentation>
-        				Various records can be joined together as
-        				'entities' within Chimp. All the necessary
-        				database objects to implement entities as
-        				matrialized views (and keep them fresh) will be
-        				automatically generated. Entities can be subject
-        				to functionality much the same as a record,
-        				including being part of a search domain.
-        			</documentation>
-        		</annotation>
-        	</element>
-        	<element name="reference" type="tns:referenceType" maxOccurs="1" minOccurs="0"></element>
-        </sequence>
-        <attribute name="label" type="string">
+    				<documentation>
+    					Controls how Chimp should store the data
+    					initally extracted from raw files.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="source" type="tns:sourceType" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Describes the data source from which Chimp will
+    					extract the raw data from.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="identification" type="tns:identificationType"
+    			maxOccurs="1" minOccurs="0">
+    			<annotation>
+    				<documentation>
+    					For identifying files as either 'ful' or
+    					'change' by means of regular expressions.
+    					Decided as part of the file scan process, note
+    					that the last line matching either of the
+    					regular expressions will win. Ideally there will
+    					be only one line in the whole file that matches
+    					either of these regular expressions.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="behaviour" type="tns:behaviourType"
+    			maxOccurs="1" minOccurs="0">
+    			<annotation>
+    				<documentation>
+    					Controls how certain functions of Chimp should
+    					behave given a certain set of circumstances.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="record" type="tns:recordType"
+    			maxOccurs="unbounded" minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Specifications are made from one or more
+    					records. Different record types can be
+    					identified by regular expressions... this
+    					feature allows for support of 'jagged' .csv
+    					files. Usually records map to a database table,
+    					though it is possible to instruct Chimp that a
+    					record is not 'useful', and that Chimp need not
+    					create database objects to store any data for
+    					it.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="entity" type="tns:entityType"
+    			maxOccurs="unbounded" minOccurs="0">
+    			<annotation>
+    				<documentation>
+    					Various records can be joined together as
+    					'entities' within Chimp. All the necessary
+    					database objects to implement entities as
+    					matrialized views (and keep them fresh) will be
+    					automatically generated. Entities can be subject
+    					to functionality much the same as a record,
+    					including being part of a search domain.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="reference" type="tns:referenceType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="label" type="string">
     		<annotation>
-    			<documentation>The "pretty" label of the specification, used for documentation and user-facing purposes.</documentation>
+    			<documentation>
+    				The "pretty" label of the specification, used for
+    				documentation and user-facing purposes.
+    			</documentation>
     		</annotation>
     	</attribute>
     	<attribute name="vendor" type="string">
     		<annotation>
-    			<documentation>Details of the company/partner who is supplying the data product.</documentation>
-    		</annotation></attribute>
+    			<documentation>
+    				Details of the company/partner who is supplying the
+    				data product.
+    			</documentation>
+    		</annotation>
+    	</attribute>
     	<attribute name="version" type="string">
     		<annotation>
-    			<documentation>Version details of the data product that this specification relates.</documentation>
-    		</annotation></attribute>
+    			<documentation>
+    				Version details of the data product that this
+    				specification relates.
+    			</documentation>
+    		</annotation>
+    	</attribute>
     	<attribute name="progressReportFrequency" type="string">
     		<annotation>
-    			<documentation>When Chimp is processing data then it will report it's progress after a certain amount of records... this value allows control about how frequently this event should occur.
-</documentation>
-    		</annotation></attribute>
+    			<documentation>
+    				When Chimp is processing data then it will report
+    				it's progress after a certain amount of records...
+    				this value allows control about how frequently this
+    				event should occur.
+    			</documentation>
+    		</annotation>
+    	</attribute>
     </complexType>
 
     <complexType name="stageConfigType">
@@ -202,7 +225,8 @@ Ideally there will be only one line in the whole file that matches either of the
     		<element name="identification"
     			type="tns:recordIdentificationType" maxOccurs="1"
     			minOccurs="0">
-    		</element>
+    		</element>
+
     		<element name="suppliedFields" type="tns:suppliedFieldsType"
     			maxOccurs="unbounded" minOccurs="1">
     		</element>
@@ -231,6 +255,7 @@ Ideally there will be only one line in the whole file that matches either of the
     		<element name="triggeredActions"
     			type="tns:triggeredActionsType" maxOccurs="1" minOccurs="0">
     		</element>
+    		<element name="alerts" type="tns:specificationAlertType" maxOccurs="1" minOccurs="0"></element>
     	</sequence>
     	<attribute name="label" type="string"></attribute>
     	<attribute name="nativeTable" type="string"></attribute>
@@ -1513,5 +1538,148 @@ LEAST visablity and GREATEST security values will also be generated automaticall
     			</restriction>
     		</simpleType>
     	</attribute>
+    </complexType>
+
+    <element name="alert" type="tns:alertType"></element>
+    
+    <complexType name="alertType">
+    	<sequence>
+    		<element name="primaryKey" type="tns:primaryKeyType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="source" type="tns:alertSource" maxOccurs="1" minOccurs="1"></element>
+    		<element name="message" type="tns:alertMessage" maxOccurs="unbounded" minOccurs="1"></element>
+    		<element name="trigger" type="tns:alertTriggerType" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+        <attribute name="description" type="string"></attribute>
+    </complexType>
+
+    <simpleType name="alertMessageType">
+    	<restriction base="string"></restriction>
+    </simpleType>
+
+    <complexType name="alertMessage">
+    	<sequence>
+    		<element name="inputs" type="tns:alertMessageInputsType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="messageText" type="string"></attribute>
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="normal"></enumeration>
+    				<enumeration value="more"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="category" type="string"></attribute>
+    	<attribute name="record" type="string"></attribute>
+    	<attribute name="level">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="notice"></enumeration>
+    				<enumeration value="warning"></enumeration>
+    				<enumeration value="error"></enumeration>
+    				<enumeration value="exception"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    </complexType>
+
+    <complexType name="alertMessageInputsType">
+
+    	<sequence>
+    		<element name="input" type="tns:alertMessageInput" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+
+    <complexType name="alertsKeyType">
+    	<attribute name="type" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="alertMessageInput">
+    	<attribute name="type">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="column"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="alertTriggeringFieldsType"></complexType>
+
+    <complexType name="alertTriggerType">
+    	<sequence>
+    		<element name="triggeringSources" type="tns:alertTriggeringSourcesType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="triggeringColumns"
+    			type="tns:alertTriggeringColumnsType" maxOccurs="1"
+    			minOccurs="0">
+    		</element>
+
+    	</sequence>
+    	
+        <attribute name="onInsert" type="boolean"></attribute>
+    	<attribute name="onDelete" type="boolean"></attribute>
+    	<attribute name="onUpdate" type="boolean"></attribute>
+    	<attribute name="rowTrigger" type="boolean"></attribute>
+    	<attribute name="condition" type="string"></attribute>
+    </complexType>
+
+    <complexType name="alertTriggeringColumnsType">
+    	<sequence>
+    		<element name="column" type="tns:alertTringgeringColumnType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="alertTringgeringColumnType">
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="alertTriggeringSourcesType">
+    	<sequence>
+    		<element name="source" type="tns:alertTriggeringSourceType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="alertTriggeringSourceType">
+    	<sequence></sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="alertSource">
+    	<attribute name="schema" type="string"></attribute>
+    	<attribute name="table" type="string"></attribute>
+    </complexType>
+
+    <complexType name="specificationAlertType">
+    	<sequence>
+    		<element name="stageAlerts" type="tns:stageAlertsType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="importAlerts" type="tns:importAlertsType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="editableAlerts"
+    			type="tns:editableAlertsType" maxOccurs="1" minOccurs="0">
+    		</element>
+    		<element name="mvAlerts" type="tns:mvAlertsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="stageAlertsType">
+    	<sequence></sequence>
+    	<attribute name="enabled" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="importAlertsType">
+    	<attribute name="enabled" type="boolean"></attribute>
+    </complexType>
+    
+    <complexType name="editableAlertsType">
+    	<attribute name="enabled" type="boolean"></attribute>
+    </complexType>
+    
+    <complexType name="mvAlertsType">
+    	<attribute name="enabled" type="boolean"></attribute>
     </complexType>
 </schema>

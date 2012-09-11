@@ -769,6 +769,45 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION shared.explode_string_to_select_clause(p_string character varying, p_record_prefixes character varying, p_variables character varying)
+  RETURNS character varying AS
+$BODY$
+DECLARE
+  r character varying;
+  v_variables character varying[];
+  v_record_prefixes character varying [];
+  v_pos integer;
+  v_overlay_value character varying;
+  v_variable_index integer = 1;
+  v_variable_parts character varying [];
+BEGIN
+  v_variables = string_to_array(p_variables, ',');
+  v_record_prefixes = string_to_array(p_record_prefixes, ',');
+  r = ''''||REPLACE(p_string,'''','''''')||'''';
+  FOR i IN 1..shared.count_in_string(p_string,'%') LOOP
+    v_pos = shared.instr(r, '%', 1, 1);
+
+    v_overlay_value = '''||';
+    v_variable_parts = string_to_array(v_variables[v_variable_index], '.');
+    IF array_upper(v_variable_parts,1)=2 THEN
+      FOR j IN 1..array_upper(v_variable_parts,1) LOOP
+        IF (v_record_prefixes[j]=v_variable_parts[1] OR v_record_prefixes[j]='p_'||v_variable_parts[1]) THEN
+          v_overlay_value = v_overlay_value || '$'||j::character varying||'.'||v_variable_parts[2]||'::character varying';
+        END IF;
+      END LOOP;
+    ELSE
+	    v_overlay_value = v_overlay_value || v_variables[v_variable_index]||'::character varying';
+    END IF;
+       
+    v_overlay_value = v_overlay_value || '||''';
+        
+    r = overlay(r placing v_overlay_value from v_pos for 1);
+    v_variable_index = v_variable_index + 1;
+  END LOOP;
+  RETURN r;
+END;
+$BODY$
+  LANGUAGE plpgsql;
 
 
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -841,3 +880,7 @@ Begin
 End;$BODY$
   LANGUAGE 'plpgsql' VOLATILE;
 
+CREATE OR REPLACE FUNCTION shared.count_in_string(text, text) 
+RETURNS integer AS $$
+  SELECT Array_upper(String_to_array($1,$2),1) - 1;
+$$ LANGUAGE SQL IMMUTABLE;

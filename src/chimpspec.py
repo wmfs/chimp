@@ -8,6 +8,7 @@ import itertools
 import calc
 import imp
 import optionsets
+import alert
 
 class AdditionalIndex():
     
@@ -878,7 +879,7 @@ class SpecificationRecord:
         self.dropIndexStatements.append(ddl)
 
 
-    def __init__(self, settings, recordTag, appLogger):
+    def __init__(self, specificationName, settings, recordTag, appLogger):
 
         #Init basic values
         self.matches=0
@@ -908,6 +909,7 @@ class SpecificationRecord:
         self.fillFactor=cs.grabAttribute(recordTag,"fillFactor")
         if self.fillFactor is not None:
             self.fillFactor = int(self.fillFactor)  
+
                         
         if appLogger is not None:            
             appLogger.debug("  withOids           : "+cs.prettyNone(str(self.withOids)))
@@ -937,7 +939,8 @@ class SpecificationRecord:
         if appLogger is not None:        
             appLogger.debug("  editable           : "+cs.prettyNone(str(self.editable)))        
 
-    
+            
+            
     
         self.defaultVisibility=cs.grabAttribute(recordTag,"defaultVisibility")
         if self.defaultVisibility is None:
@@ -1186,6 +1189,36 @@ class SpecificationRecord:
         self.computedData = calc.CalculatedData("table", computedDataTag, settings)
         if appLogger is not None:
             self.computedData.debug(appLogger)
+
+        # =================================
+        
+        alertsTag = recordTag.getElementsByTagName("alerts")
+        self.alerts={}
+        if len(alertsTag) >0:
+            alertsTag = alertsTag[0]
+            for alertTag in alertsTag.childNodes:
+                if hasattr(alertTag,"tagName"):
+                    enabled = cs.grabAttribute(alertTag,"enabled")
+                    if enabled is not None:
+                        if enabled in("true","True","TRUE"):
+                            schema = alertTag.tagName[:-6]                         
+                            self.alerts[schema] = alert.Alert(specificationName, schema, settings, record=self)
+                            self.alerts[schema].debug(appLogger)
+            
+#  
+#        
+#        alertsEnabled =cs.grabAttribute(recordTag,"alerts")
+#        
+#        
+#        if alertsEnabled is None:
+#            alertsEnabled = self.editable
+#        else:
+#            if alertsEnabled in("true","True","TRUE"):
+#                alertsEnabled=True
+#            else:
+#                alertsEnabled=False
+#        self.alerts = alert.Alert(alertsEnabled, settings, record = self)
+#        self.alerts.debug(appLogger)
         
 class Spec:
 
@@ -1511,7 +1544,7 @@ class Spec:
                 appLogger.debug("")
                 
             for thisRecordTag in allRecordTags:
-                newRecord=SpecificationRecord(settings, thisRecordTag, appLogger)
+                newRecord=SpecificationRecord(self.name, settings, thisRecordTag, appLogger)
                 self.records.append(newRecord)
     
             #Build a simple list of entity objects
