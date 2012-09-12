@@ -1301,13 +1301,18 @@ class SpecificationSQLBuilder:
         if schemaName in record.alerts:
             alertInjection = record.alerts[schemaName].getDmlInjection(mode)
             #sql += "  v_old_record {0}.all_{1}_{2}_params;\n".format(ALERTS_SCHEMA, schemaName, record.table)
+            if storageTable.schema =='editable':
+                identifierInfo = "id '||p_id::character varying"
+            else:
+                identifierInfo = "key ('||{0}||')'".format("||', '||".join(map(lambda x:"p_{0}::character varying".format(x), record.primaryKeyColumns)))
 
             additionalExceptions = ("  WHEN NO_DATA_FOUND THEN\n"
-                                    "    v_message = ('{0}','NODATA','Unable to {3} expected ''{1}.{2}'' record.',NULL,0,'Could not find a row with id '||p_id::character varying);\n"
+                                    "    v_message = ('{0}','NODATA','Unable to {3} expected ''{1}.{2}'' record.',NULL,0,'Could not find {4});\n"
                                     "    RETURN NEXT v_message;\n".format(whenNoDataFoundBehaviour, #0
                                                                           storageTable.schema, #1
                                                                           storageTable.name, #2
-                                                                          mode)) #3 
+                                                                          mode, #3
+                                                                          identifierInfo)) #4 
 
         else:
             alertInjection = ""
@@ -1411,11 +1416,18 @@ class SpecificationSQLBuilder:
         if schemaName in record.alerts:
             alertInjection = record.alerts[schemaName].getDmlInjection("delete")
             sql += "  v_old_record record;\n"
+            
+            if storageTable.schema =='editable':
+                identifierInfo = "id '||p_id::character varying"
+            else:
+                identifierInfo = "key ('||{0}||')'".format("||', '||".join(map(lambda x:"p_{0}::character varying".format(x), record.primaryKeyColumns)))
+            
             additionalExceptions = ("  WHEN NO_DATA_FOUND THEN\n"
-                                    "    v_result = ('{0}','NODATA','Unable to delete expected ''{1}.{2}'' record.',NULL,0,'Could not find a row with id '||p_id::character varying);\n"
+                                    "    v_result = ('{0}','NODATA','Unable to delete expected ''{1}.{2}'' record.',NULL,0,'Could not find {3});\n"
                                     "    RETURN NEXT v_result;\n".format(whenNoDataFoundBehaviour, #0
                                                                           storageTable.schema, #1
-                                                                          storageTable.name)) #2 
+                                                                          storageTable.name, #2
+                                                                          identifierInfo)) #3 
                                     
 # ("level" character varying(30),
 #    code character varying(30),
