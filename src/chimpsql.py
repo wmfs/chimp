@@ -1257,6 +1257,8 @@ class SpecificationSQLBuilder:
         
         parameters = []
         if schemaName == "import":
+            if mode=="merge":
+                parameters.append(SystemField("p_id_to_use_if_inserting", "bigint"))
             parameters.append(SystemField("p_task_id", "integer"))
         else:
             parameters += [SystemField("p_id", "bigint"), SystemField("p_latest_source", "character varying")]
@@ -1332,7 +1334,7 @@ class SpecificationSQLBuilder:
                            "    INSERT INTO {1}.{2} (\n"
                            "     id{3}{4}{5}{6})\n" 
                            "    VALUES (\n"
-                           "     p_id{7}{8}{9}{10});\n"                           
+                           "     {11}{7}{8}{9}{10});\n"                           
                            "  END IF;\n"
                            "END IF;\n").format(insertAlertInjection, #0
                                                storageTable.schema, #1
@@ -1344,7 +1346,8 @@ class SpecificationSQLBuilder:
                                                "" if schemaName != "editable" else ",\n     p_latest_source,\n     p_latest_source", #7
                                                "".join(map(lambda field: ",\n     p_{0}".format(field.column), record.getAllMappedFields())), #8
                                                "" if schemaName != "import" else ",\n     p_task_id,\n     p_task_id,\n     p_task_id", #9
-                                               "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security") #10
+                                               "" if schemaName != record.getDestinationTargetSchema() else ",\n     p_visibility,\n     p_security", #10
+                                               "p_id_to_use_if_inserting" if schemaName =="import" else "p_id") #11
         else:
             mergeWrapUp=""
 
@@ -1472,74 +1475,73 @@ class SpecificationSQLBuilder:
         return Function(functionName, schemaName, 
                 [field.typeName for field in parameters],sql)       
 
-    
-    def getStorageMergeFunction(self, record, schemaName, storageTable, storageInsertFunction, storageUpdateFunction):
-        functionName = "{0}_merge".format(record.table)
-        
-        parameters = [SystemField("p_id", "bigint")]
-        if schemaName == "import":
-            parameters.append(SystemField("p_task_id", "integer"))
-        else:
-            parameters.append(SystemField("p_source", "character varying"))            
-        parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getAllMappedFields()]        
-        if schemaName == record.getDestinationTargetSchema():
-            parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]
-        
-        return Function(functionName, schemaName, 
-                [field.typeName for field in parameters],
-                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
-                "  {2}\n"               
-                ") RETURNS SETOF shared.chimp_message AS $$\n"
-                "DECLARE\n"
-                "  v_perform_insert boolean;\n"
-                "  v_update_occurred boolean;\n"
-                "  v_message record;\n"
-                "BEGIN\n"
-                "  v_perform_insert = TRUE;\n"
-                "  v_update_occurred = TRUE;\n"
-                "  FOR v_message IN SELECT * FROM {3}.{4}(\n"
-                "    {5},\n"
-                "    {6}{7}\n"
-                ") LOOP\n"
-                "    IF v_message.level in('error','exception') THEN\n"
-                "      v_perform_insert = FALSE;\n"
-                "    END IF;\n"
-                "    IF v_message.code='IMP001' THEN\n"
-                "      v_update_occurred = FALSE;\n"
-                "    ELSE\n"
-                "      RETURN NEXT v_message;\n"
-                "    END IF;\n"                                
-                "  END LOOP;\n"
-                "  IF v_perform_insert AND (NOT v_update_occurred) THEN\n"
-                "    FOR v_message IN SELECT * FROM {8}.{9}(\n"
-                "      p_id,\n"
-                "      {10},\n"
-                "      {11}{12}\n"
-                "  ) LOOP\n"
-                "      RETURN NEXT v_message;\n"
-                "    END LOOP;\n"
-                "  END IF;\n"
-                "EXCEPTION\n"
-                "  WHEN others THEN\n"
-                "    v_message = shared.make_exception('IMP008','Unhandled exception while merging',NULL,1,SQLERRM);\n"
-                "    RETURN NEXT v_message;\n"
-                "END;\n"
-                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName,
-#                        "p_task_id integer" if schemaName == "import" else "p_source character varying",
-#                        ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
-#                        "" if schemaName == record.getDestinationTargetSchema() else ",\n  p_visibility integer,\n  p_security integer",
-                        ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]),
-                        
-                        storageUpdateFunction.schema, storageUpdateFunction.name,
-                        "p_task_id" if schemaName == "import" else "p_id,\n    p_source",
-                        ",\n    ".join(["p_" + field.column for field in record.getAllMappedFields()]),
-                        "" if schemaName != record.getDestinationTargetSchema() else ",\n    p_visibility,\n    p_security",
-                        
-                        storageInsertFunction.schema, storageInsertFunction.name,
-                        "p_task_id" if schemaName == "import" else "p_source",
-                        ",\n      ".join(["p_" + field.column for field in record.getAllMappedFields()]),
-                        "" if schemaName != record.getDestinationTargetSchema() else ",\n      p_visibility,\n      p_security"))
-
+#    
+#    def getStorageMergeFunction(self, record, schemaName, storageTable, storageInsertFunction, storageUpdateFunction):
+#        functionName = "{0}_merge".format(record.table)
+#        
+#        parameters = [SystemField("p_id", "bigint")]
+#        if schemaName == "import":
+#            parameters.append(SystemField("p_task_id", "integer"))
+#        else:
+#            parameters.append(SystemField("p_source", "character varying"))            
+#        parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getAllMappedFields()]        
+#        if schemaName == record.getDestinationTargetSchema():
+#            parameters += [SystemField("p_visibility", "integer"), SystemField("p_security", "integer")]
+#        
+#        return Function(functionName, schemaName, 
+#                [field.typeName for field in parameters],
+#                ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
+#                "  {2}\n"               
+#                ") RETURNS SETOF shared.chimp_message AS $$\n"
+#                "DECLARE\n"
+#                "  v_perform_insert boolean;\n"
+#                "  v_update_occurred boolean;\n"
+#                "  v_message record;\n"
+#                "BEGIN\n"
+#                "  v_perform_insert = TRUE;\n"
+#                "  v_update_occurred = TRUE;\n"
+#                "  FOR v_message IN SELECT * FROM {3}.{4}(\n"
+#                "    {5},\n"
+#                "    {6}{7}\n"
+#                ") LOOP\n"
+#                "    IF v_message.level in('error','exception') THEN\n"
+#                "      v_perform_insert = FALSE;\n"
+#                "    END IF;\n"
+#                "    IF v_message.code='IMP001' THEN\n"
+#                "      v_update_occurred = FALSE;\n"
+#                "    ELSE\n"
+#                "      RETURN NEXT v_message;\n"
+#                "    END IF;\n"                                
+#                "  END LOOP;\n"
+#                "  IF v_perform_insert AND (NOT v_update_occurred) THEN\n"
+#                "    FOR v_message IN SELECT * FROM {8}.{9}(\n"
+#                "      p_id,\n"
+#                "      {10},\n"
+#                "      {11}{12}\n"
+#                "  ) LOOP\n"
+#                "      RETURN NEXT v_message;\n"
+#                "    END LOOP;\n"
+#                "  END IF;\n"
+#                "EXCEPTION\n"
+#                "  WHEN others THEN\n"
+#                "    v_message = shared.make_exception('IMP008','Unhandled exception while merging',NULL,1,SQLERRM);\n"
+#                "    RETURN NEXT v_message;\n"
+#                "END;\n"
+#                "$$ LANGUAGE plpgsql;\n\n").format(schemaName, functionName,
+##                        "p_task_id integer" if schemaName == "import" else "p_source character varying",
+##                        ",\n  ".join(map(lambda field: "p_{0} {1}".format(field.column, field.columnDataType), record.getAllMappedFields())),
+##                        "" if schemaName == record.getDestinationTargetSchema() else ",\n  p_visibility integer,\n  p_security integer",
+#                        ",\n  ".join(["{0} {1}".format(field.column, field.typeName) for field in parameters]),
+#                        
+#                        storageUpdateFunction.schema, storageUpdateFunction.name,
+#                        "p_task_id" if schemaName == "import" else "p_id,\n    p_source",
+#                        ",\n    ".join(["p_" + field.column for field in record.getAllMappedFields()]),
+#                        "" if schemaName != record.getDestinationTargetSchema() else ",\n    p_visibility,\n    p_security",
+#                        
+#                        storageInsertFunction.schema, storageInsertFunction.name,
+#                        "p_task_id" if schemaName == "import" else "p_source",
+#                        ",\n      ".join(["p_" + field.column for field in record.getAllMappedFields()]),
+#                        "" if schemaName != record.getDestinationTargetSchema() else ",\n      p_visibility,\n      p_security"))
     
     def getSharedToMergeIntoEditableView(self, thisRecord):
         viewName = "{0}_to_merge_into_editable".format(thisRecord.table)

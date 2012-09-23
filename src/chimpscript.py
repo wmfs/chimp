@@ -456,8 +456,9 @@ def makePostgreSQLBuildScript(settings, version):
                 
                 # MERGE 
                 # =====
-                storageMergeFunction = sqlBuilder.getStorageUpsertFunction("merge", record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
-                registerAndWrite(storageMergeFunction, objectRegistry, file)
+                if schemaName != "editable":
+                    storageMergeFunction = sqlBuilder.getStorageUpsertFunction("merge", record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
+                    registerAndWrite(storageMergeFunction, objectRegistry, file)
                 
                 # BUILD IMPORT TRANSFORMATION SCRIPTS
                 # ===================================                                                          
@@ -678,8 +679,7 @@ def makePostgreSQLBuildScript(settings, version):
                 
                 alertTable = alert.getAlertTable(sequence)
                 registerAndWrite(alertTable, objectRegistry, file)
-                            
-                registerAndWrite(alert.getAlertRecordIdIndex(alertTable), objectRegistry, file)
+                    
                 registerAndWrite(alert.getAlertPkIndex(alertTable), objectRegistry, file)
                 
                 registerAndWrite(alert.getRegistryEnabledIndex(table), objectRegistry, file)

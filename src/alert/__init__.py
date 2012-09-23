@@ -12,7 +12,8 @@ class Alert:
     
 
     def getOldRecordSelectList(self):
-        return ",".join(map(lambda x:x.column, self.fields))
+        columns = ",".join(map(lambda x:x.column, self.fields))
+        return columns
 
     def getDmlInjection(self, dmlEvent, flagVariableOverride=None):
 
@@ -89,8 +90,8 @@ class Alert:
                "    IF v_message.level in('error','exception') THEN\n"
                "      {3} = FALSE;\n"
                "    END IF;\n"
-               "    INSERT INTO {0}.{1}_{2}_alerts (record_id,{5},domain,level,code,title,affected_columns,affected_row_count,content)\n"
-               "    VALUES (p_id,{6},'alert',v_message.level,v_message.code,v_message.title,v_message.affected_columns,v_message.affected_row_count,v_message.content);\n"
+               "    INSERT INTO {0}.{1}_{2}_alerts ({5},domain,level,code,title,affected_columns,affected_row_count,content)\n"
+               "    VALUES ({6},'alert',v_message.level,v_message.code,v_message.title,v_message.affected_columns,v_message.affected_row_count,v_message.content);\n"
                "    RETURN NEXT v_message;\n"
                "  END LOOP;\n").format(ALERTS_SCHEMA, #0
                                        self.sourceSchema,#1
@@ -163,11 +164,6 @@ class Alert:
         ddl += ");\n\n"
         return chimpsql.Type(typeName, ALERTS_SCHEMA, ddl)
 
-    def getAlertRecordIdIndex(self, table):
-        indexName = "alert_{0}_record_id_idx".format(table.name)                
-        return chimpsql.Index(indexName, table.name, ALERTS_SCHEMA, 
-                     "CREATE INDEX {0} ON {1}.{2} (record_id);\n\n".format(indexName, ALERTS_SCHEMA, table.name))
-
     def getAlertPkIndex(self, table):
         indexName = "alert_{0}_pk_idx".format(table.name)                
         return chimpsql.Index(indexName, table.name, ALERTS_SCHEMA, 
@@ -179,8 +175,7 @@ class Alert:
         for field in self.primaryKeyFields:
             primaryKeyColumns += "\n  {0},".format(field.strippedColumnClause(None, False))        
         ddl = ("CREATE TABLE {0}.{1} (\n"
-               "  id bigint PRIMARY KEY default nextval('{3}.{4}'),\n"
-               "  record_id bigint NOT NULL,\n{2}\n"
+               "  id bigint PRIMARY KEY default nextval('{3}.{4}'),\n{2}"
                "  domain character varying(30) NOT NULL,\n"               
                "  level character varying(30) NOT NULL,\n"
                "  code character varying(30) NOT NULL,\n"
@@ -188,7 +183,11 @@ class Alert:
                "  affected_columns character varying(2000),\n"
                "  affected_row_count integer,\n"
                "  content character varying(4000),\n"
-               "  created timestamp with time zone NOT NULL DEFAULT now());\n").format(ALERTS_SCHEMA, tableName, primaryKeyColumns, sequence.schema, sequence.name)
+               "  created timestamp with time zone NOT NULL DEFAULT now());\n").format(ALERTS_SCHEMA, #0 
+                                                                                       tableName, #1
+                                                                                       primaryKeyColumns, #2
+                                                                                       sequence.schema, #3
+                                                                                       sequence.name)#4
         return chimpsql.Table(tableName, ALERTS_SCHEMA, ddl)
 
     

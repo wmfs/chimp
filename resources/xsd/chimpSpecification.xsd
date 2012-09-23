@@ -120,7 +120,7 @@
     				event should occur.
     			</documentation>
     		</annotation>
-    	</attribute>
+    	</attribute>
     </complexType>
 
     <complexType name="stageConfigType">
@@ -265,7 +265,7 @@ Ideally there will be only one line in the whole file that matches either of the
     	<attribute name="editable" type="boolean"></attribute>
     	<attribute name="defaultVisibility" type="int"></attribute>
     	<attribute name="defaultSecurity" type="int"></attribute>
-    	<attribute name="fillFactor" type="int"></attribute>
+    	<attribute name="fillFactor" type="int"></attribute>
     </complexType>
 
     <complexType name="entityType">
@@ -1657,7 +1657,6 @@ LEAST visablity and GREATEST security values will also be generated automaticall
 
     <complexType name="specificationAlertType">
     	<sequence>
-    		<element name="stageAlerts" type="string" maxOccurs="1" minOccurs="0"></element>
     		<element name="importAlerts" type="tns:importAlertsType" maxOccurs="1" minOccurs="0"></element>
     		<element name="editableAlerts"
     			type="tns:editableAlertsType" maxOccurs="1" minOccurs="0">
