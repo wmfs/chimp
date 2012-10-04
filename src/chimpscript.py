@@ -456,7 +456,7 @@ def makePostgreSQLBuildScript(settings, version):
                 
                 # MERGE 
                 # =====
-                if schemaName != "editable":
+                if schemaName != "editable" and len(record.primaryKeyColumns)>0:
                     storageMergeFunction = sqlBuilder.getStorageUpsertFunction("merge", record, schemaName, storageTable, settings.env["defaultNoDataFoundBehaviour"])
                     registerAndWrite(storageMergeFunction, objectRegistry, file)
                 
