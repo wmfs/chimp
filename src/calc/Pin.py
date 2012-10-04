@@ -24,7 +24,11 @@ class Pin:
         self.description= cs.grabAttribute(pinTag,"description")
         self.xColumn = cs.grabAttribute(pinTag,"xColumn")
         self.yColumn = cs.grabAttribute(pinTag,"yColumn")
+        
         self.whereClause = cs.grabAttribute(pinTag,"whereClause")
+        if self.whereClause is not None:
+            self.whereClause = self.whereClause.replace("'","''")
+        
         self.idColumn = cs.grabAttribute(pinTag,"idColumn")
         self.keyColumn = cs.grabAttribute(pinTag,"keyColumn")
         self.documentType = cs.grabAttribute(pinTag,"documentType")
@@ -50,28 +54,7 @@ class Pin:
             for thisIndex in indexesTag:
                 self.additionalIndexes.append(chimpspec.AdditionalIndex(thisIndex))
         
-        
-#                <computedData>
-#                    <computedElement>
-#                    <customColumn outputColumn="uprn" type="number" size="12" label="UPRN">                    
-#                        <templateAssembler>
-#                            <content>
-#                                <contentElement column="uprn"/>
-#                            </content>
-#                        </templateAssembler>                    
-#                    </customColumn>    
-#                    </computedElement>
-#
-#                    <computedElement>
-#                    <customColumn outputColumn="blpu_label" type="text" size="500" label="Full BLPU label">
-#                        <templateAssembler>
-#                            <content>
-#                                <contentElement column="blpu_label"/>
-#                            </content>
-#                        </templateAssembler>                    
-#                    </customColumn>
-#                    </computedElement>
-#                </computedData>    
+    
                 
  
     def getTriggeringColumns(self):
