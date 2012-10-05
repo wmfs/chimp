@@ -631,7 +631,10 @@ class Queuer:
             
             #Full/change regexs available...
             scanCount=0
-            scanFile=open(filename,"r")
+            if specification.encoding is None:
+                scanFile=open(filename,"r")
+            else:
+                scanFile=open(filename,"r", encoding=specification.encoding)
             for line in scanFile:
                 if identification is None:
                     if specification.compiledFullRegex.search(line) is not None:
