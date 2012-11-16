@@ -1326,7 +1326,7 @@ class SpecificationSQLBuilder:
             if schemaName in record.alerts:
                 insertAlertInjection = record.alerts[schemaName].getDmlInjection("insert",flagVariableOverride="v_perform_merge")
             else:
-                insertAlertInjection = ""
+                insertAlertInjection = "  v_perform_merge = TRUE;\n"
 
             mergeWrapUp = ("\nELSE\n"
                            "  -- No record, so do an insert instead\n{0}"
