@@ -111,34 +111,34 @@ class Stager:
                     else:
                         csvReader = csv.reader(row, delimiter=self.d)
                     
-                    for row in csvReader:
-                        
-                        importData = []    
-                        fieldIndex = 0
-    
-                        for thisField in thisRecord.fields:
-                            if thisField.column  is not None:
-                                
-                                rawFieldValue = row[fieldIndex]
-                                nativeFieldValue = None
-                                                                          
-                                if len(rawFieldValue) > 0:
-                                    nativeFieldValue = self._getCSVNativeFieldValue(thisField.type, rawFieldValue, self.specification.encoding, thisField.decimalPlaces, self.specification.dateFormat, self.specification.timeFormat, self.specification.dateTimeFormat)                                        
-    
-                                importData.append(nativeFieldValue)
-                                      
-                            fieldIndex = fieldIndex + 1                            
-
-                    # Decide on an action...                      
-                    identification = self._getCSVRecordIdentification(thisRecord, formatted) 
-    
                     try:
+                        
+                        for row in csvReader:
+                        
+                            
+                            importData = []    
+                            fieldIndex = 0
+        
+                            for thisField in thisRecord.fields:
+                                if thisField.column  is not None:
+                                    
+                                    rawFieldValue = row[fieldIndex]
+                                    nativeFieldValue = None
+                                                                              
+                                    if len(rawFieldValue) > 0:
+                                        nativeFieldValue = self._getCSVNativeFieldValue(thisField.type, rawFieldValue, self.specification.encoding, thisField.decimalPlaces, self.specification.dateFormat, self.specification.timeFormat, self.specification.dateTimeFormat)                                        
+        
+                                    importData.append(nativeFieldValue)
+                                          
+                                fieldIndex = fieldIndex + 1                            
+    
+                        # Decide on an action...                      
+                        identification = self._getCSVRecordIdentification(thisRecord, formatted) 
+    
                         self._stageRecord(identification, thisRecord, importData)     
                     except Exception as detail:
                         print ("Original line:")
-                        print (line)
-                        print (thisRecord.stageCall)
-                        print (importData)
+                        print (row)
                         raise                        
                    
             if not matchFound:
