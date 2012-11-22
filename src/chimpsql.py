@@ -1360,7 +1360,7 @@ class SpecificationSQLBuilder:
                     "  INTO v_old_record\n"
                     "  FROM {1}.{2}\n"
                     "  WHERE {3};\n"
-                    "\nIF v_old_record IS NOT NULL THEN\n").format(",".join(map(lambda x:x.column, record.getAllMappedFields())), #0
+                    "\nIF FOUND THEN\n").format(",".join(map(lambda x:x.column, record.getAllMappedFields())), #0
                                                                    schemaName,#1
                                                                    record.table,#2
                                                                    "id = p_id" if schemaName == "editable" else " AND ".join(map(lambda x:"{0} = p_{0}".format(x), record.primaryKeyColumns)))
