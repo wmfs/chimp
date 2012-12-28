@@ -16,6 +16,11 @@ CREATE TABLE shared.specification_registry
  last_sent_to_editable timestamp with time zone
 );
 
+CREATE TABLE shared.specification_tables
+(table_name character varying (200) not null primary key,
+ specification_name character varying (30) not null);
+
+
 CREATE OR REPLACE FUNCTION shared.register_specification(
   p_name character varying,
   p_label character varying,
