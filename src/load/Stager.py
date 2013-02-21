@@ -307,7 +307,9 @@ class Stager:
     
         if nativeDataType == "time":
             dt = datetime.datetime.strptime(rawValue.strip(), timeFormat)
-            nativeFieldValue =  datetime.datetime.time(dt.hour, dt.minute, dt.second)
+            nativeFieldValue =  datetime.time(dt.hour, dt.minute, dt.second)
+            #nativeFieldValue = datetime.datetime.
+            
     
         if nativeDataType == "datetime":
             nativeFieldValue = datetime.datetime.strptime(rawValue.strip(), dateTimeFormat)
