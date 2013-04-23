@@ -436,28 +436,25 @@ class Loader:
         if minTaskId is not None and maxTaskId is not None:
             
             # Scanning
-            totalStaleCount=0
             for thisRecord in specification.records:
-                if thisRecord.useful:
+                if thisRecord.table == args["table"]:
                     
                     if minTaskId==maxTaskId:
                         sql = "select count(*) from import.%s" %(thisRecord.table)
                         sql = sql + " where last_affirmed_task_id != %s"
+                        settings.appLogger.debug("|   staleSql:{0}".format(sql))
                         dataCursor.execute(sql, (minTaskId,))                    
                     else:
                         sql = "select count(*) from import.%s" %(thisRecord.table)
                         sql = sql + " where last_affirmed_task_id not (between %s and %s)"
+                        settings.appLogger.debug("|   staleSql:{0}".format(sql))
                         dataCursor.execute(sql, (minTaskId,maxTaskId))                    
     
                     staleCount = int(dataCursor.fetchone()[0])
-                    totalStaleCount = totalStaleCount + staleCount
-            self.queue.setScanResults(taskId, totalStaleCount)    
             
-            #Process
-            lineCount=0
-            for thisRecord in specification.records:
-                if thisRecord.useful:
-                                    
+                    self.queue.setScanResults(taskId, staleCount)   
+                    settings.appLogger.debug("|   staleCount:{0}".format(staleCount)) 
+                                           
                     params=[]
                     for i in range(0,len(thisRecord.primaryKeyColumns)+1):
                         params.append("%s")
@@ -471,8 +468,10 @@ class Loader:
                         sql = "select %s from import.%s" %(cs.delimitedStringList(thisRecord.primaryKeyColumns,","), thisRecord.table)
                         sql = sql + " where last_affirmed_task_id not (between %s and %s)"
                         dataCursor.execute(sql, (minTaskId,maxTaskId))                    
-    
-                    for data in dataCursor:
+                    
+                    results = dataCursor.fetchall()
+                    deletedRowCount = 0
+                    for data in results:
                         deleteParams=[]
                         deleteParams.append(taskId)
                         i=0
@@ -480,7 +479,11 @@ class Loader:
                             deleteParams.append(data[i])
                             i=i+1
                         dataCursor.execute(dml, tuple(deleteParams))
-                        messages = dataCursor.fetchall()
+                        deletedRowCount += 1
+                        if deletedRowCount < 10:
+                            settings.appLogger.debug("|   {0}".format(deleteParams))
+                        
+                        messages = dataCursor.fetchall()                        
                         for thisMessage in messages:
                             msgLevel = thisMessage[0]
                             msgCode = thisMessage[1]
@@ -490,9 +493,10 @@ class Loader:
                             msgContent = thisMessage[5]
                             self.queue.addTaskMessage(taskId, thisRecord.table, 0, msgLevel, msgCode, msgTitle, msgAffectedColumns, msgAffectedRowCount, msgContent)
                     
-                    totalStaleCount = totalStaleCount + staleCount            
-            
-        self.supportConnection.connection.commit()    
+                    settings.appLogger.debug("|   deletedRowCount: {0}".format(deletedRowCount))
+
+        self.supportConnection.connection.commit()  
+          
         return( (successCount, exceptionCount, errorCount, warningCount, ignoredCount, noticeCount) )
     
     
