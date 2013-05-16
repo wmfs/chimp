@@ -463,10 +463,12 @@ class Loader:
                     if minTaskId==maxTaskId:
                         sql = "select %s from import.%s" %(cs.delimitedStringList(thisRecord.primaryKeyColumns,","), thisRecord.table)
                         sql = sql + " where last_affirmed_task_id != %s"
+                        settings.appLogger.debug("|   dataSQL:{0}".format(sql%(minTaskId)))
                         dataCursor.execute(sql, (minTaskId,))                    
                     else:
                         sql = "select %s from import.%s" %(cs.delimitedStringList(thisRecord.primaryKeyColumns,","), thisRecord.table)
                         sql = sql + " where last_affirmed_task_id not (between %s and %s)"
+                        settings.appLogger.debug("|   dataSQL:{0}".format(sql%(minTaskId,maxTaskId)))
                         dataCursor.execute(sql, (minTaskId,maxTaskId))                    
                     
                     results = dataCursor.fetchall()
