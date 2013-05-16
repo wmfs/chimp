@@ -453,7 +453,7 @@ class Loader:
                     staleCount = int(dataCursor.fetchone()[0])
             
                     self.queue.setScanResults(taskId, staleCount)   
-                    settings.appLogger.debug("|   staleCount:{0}".format(staleCount)) 
+                    settings.appLogger.debug("|   staleCount: {0}".format(staleCount)) 
                                            
                     params=[]
                     for i in range(0,len(thisRecord.primaryKeyColumns)+1):
@@ -463,14 +463,14 @@ class Loader:
                     if minTaskId==maxTaskId:
                         sql = "select %s from import.%s" %(cs.delimitedStringList(thisRecord.primaryKeyColumns,","), thisRecord.table)
                         sql = sql + " where last_affirmed_task_id != %s"
-                        settings.appLogger.debug("|   dataSQL:{0}".format(sql%(minTaskId)))
+                        settings.appLogger.debug("|   dataSQL: {0}".format(sql%(minTaskId)))
                         dataCursor.execute(sql, (minTaskId,))                    
                     else:
                         sql = "select %s from import.%s" %(cs.delimitedStringList(thisRecord.primaryKeyColumns,","), thisRecord.table)
                         sql = sql + " where last_affirmed_task_id not (between %s and %s)"
                         settings.appLogger.debug("|   dataSQL:{0}".format(sql%(minTaskId,maxTaskId)))
                         dataCursor.execute(sql, (minTaskId,maxTaskId))                    
-                    
+                    settings.appLogger.debug("|   dml: {0}".format(dml))
                     results = dataCursor.fetchall()
                     deletedRowCount = 0
                     for data in results:
@@ -480,10 +480,12 @@ class Loader:
                         for thisPkColumn in thisRecord.primaryKeyColumns:
                             deleteParams.append(data[i])
                             i=i+1
-                        dataCursor.execute(dml, tuple(deleteParams))
-                        deletedRowCount += 1
+
                         if deletedRowCount < 10:
                             settings.appLogger.debug("|   {0}".format(deleteParams))
+                        
+                        dataCursor.execute(dml, tuple(deleteParams))
+                        deletedRowCount += 1
                         
                         messages = dataCursor.fetchall()                        
                         for thisMessage in messages:
