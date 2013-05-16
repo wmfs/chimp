@@ -1402,11 +1402,8 @@ class SpecificationSQLBuilder:
             parameters.append(SystemField("p_id", "bigint"))
         else:
             parameters.append(SystemField("p_task_id", "integer"))
-            #parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getPrimaryKeyFields()]
-            print()
-            print(storageTable.name)
-            for field in record.getPrimaryKeyFields():
-                print(field.column)            
+            parameters += [SystemField("p_" + field.column, field.columnDataType) for field in record.getPrimaryKeyFields()]
+
 
 
         sql = ("CREATE OR REPLACE FUNCTION {0}.{1} (\n"
