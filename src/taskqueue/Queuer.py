@@ -617,15 +617,21 @@ class Queuer:
         
         identification = None
         if specification.fullRegex is None and specification.changeRegex is None:
-    
-            if specification.encoding is None:        
-                with open(filename, "r") as f:
-                    for scanCount, l in enumerate(f):
-                        pass
-            else:
-                with open(filename, "r", encoding="%s"%(specification.encoding)) as f:
-                    for scanCount, l in enumerate(f):
-                        pass
+            try:
+                if specification.encoding is None:        
+                    with open(filename, "r") as f:
+                        for scanCount, l in enumerate(f):
+                            pass
+                else:
+                    with open(filename, "r", encoding="%s"%(specification.encoding)) as f:
+                        for scanCount, l in enumerate(f):
+                            pass
+            except:
+                print("Exception scanning {0}".format(filename))
+                print("{0}".format(l))
+                raise
+            
+            
                 
         elif specification.fullRegex is not None and specification.changeRegex is not None:
             
