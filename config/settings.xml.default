@@ -82,6 +82,7 @@
     <key name="defaultZoneId" value="3" />
     <key name="defaultDuplicateKeyBehaviour" value="error" />
     <key name="defaultNoDataFoundBehaviour" value="warning" />
+    <key name="initializationVector" value="1234" />
   </registry>
   
   <visibilityLevels>
@@ -99,5 +100,10 @@
 	<zone id="2" schema="areas" table="my_boundary_plus_10k_buffer" column="wkb_geometry"/>
 	<zone id="1" schema="areas" table="my_boundary" column="wkb_geometry"/>
   </zones>
+  
+  <initializationVector>
+    <vector value="12345"/>
+  </initializationVector>
+		  
 		  
 </settings>
