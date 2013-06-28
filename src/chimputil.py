@@ -1,13 +1,77 @@
-'''
-Created on 8 Dec 2011
 
-@author: Ryan Pickett
-'''
 import collections
 import re
 
+
+#
+#  URN Encoder/Decoder
+#
+#  Author Paula Thomas <paula.thomas@wmfs.net>
+#
+class UrnEncoderDecoder:        
+    
+    """Python class which converts unique reference numbers to Base31 encoded strings """
+        
+    #
+    # encode a URN
+    def encode(urn, initializationVector):
+        ALPHABET = "0123456789zbcdyfghxjklmnwpqrstv"
+        BASE = len(ALPHABET)
+        #
+        # convert from string to number
+        n = int(urn)
+        if n == 0:
+            return ALPHABET[0]
+
+        #
+        # add initialisation vector to make it harder to pre-guess
+        # result of encoding
+        n = n + initializationVector
+    
+        # We're only dealing with nonnegative integers.
+        if n < 0:
+            raise Exception() # Raise a better exception than this in real life.
+
+        result = ""
+
+        #
+        # now encode..
+        while (n > 0):
+            result = ALPHABET[n % BASE] + result           
+            n /= BASE
+            n = int(n)
+
+        #
+        # return result as upper-case string
+        return result.upper()
+
+    #
+    # decode a string
+    
+    def decode(originalEncodedValue, initializationVector):
+        ALPHABET = "0123456789zbcdyfghxjklmnwpqrstv"
+        BASE = len(ALPHABET)
+        #
+        # force to lower case prior to decoding
+        encoded = originalEncodedValue.lower()
+        
+        result = 0
+
+        #
+        # decode
+        for i in range(len(encoded)):
+            place_value = ALPHABET.index(encoded[i])
+            result += place_value * (BASE ** (len(encoded) - i - 1))
+
+        #
+        # subtract initialisation vector and return as string
+        return result - initializationVector
+
+
 BuildScriptResult = collections.namedtuple("BuildScriptResult", 
                                            ["filename", "errorsFound", "warningsFound"]) 
+
+
 
 def title(s):
     if s is not None:

@@ -189,6 +189,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
     inputSourceSchema = args["inputSourceSchema"]
     inputSourceName = args["inputSourceName"]
     customList = args["customList"] 
+    flushQueue = args["flushQueue"]
             
     appLogger.info("")
     appLogger.info("  {0}.{1}:".format(inputSourceSchema,inputSourceName))
@@ -226,6 +227,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
 
     appLogger.info("  loopSql   : {0}".format(loopSql))
     appLogger.info("  updateDml : {0}".format(updateDml))
+    appLogger.info("  deleteDml : flushQueue={1} - {0}".format(flushQueue, deleteFromQueue))
     recordCount=0
 
     for record in loopCursor:   
@@ -244,7 +246,8 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
         params.append(id)
 
         dataCursor.execute(updateDml, tuple(params))
-        dataCursor.execute(deleteFromQueue, (id,))
+        if flushQueue:
+            dataCursor.execute(deleteFromQueue, (id,))
         
         successCount += 1
         
