@@ -57,7 +57,57 @@ class SpecificationSQLBuilder:
                                     "NULL" if self.specification.vendor is None else "'{0}'".format(self.specification.vendor),
                                     "NULL" if self.specification.version is None else "'{0}'".format(self.specification.version),
                                     "NULL" if self.specification.fileWildcard is None else "'{0}'".format(self.specification.fileWildcard)),
-                   dropDdl="SELECT {0}.unregister_specification('{1}');\n".format(SHARED_SCHEMA, self.specification.name))
+                                                                        
+                   dropDdl=("SELECT {0}.unregister_specification('{1}');\n"
+                            "SELECT {0}.unregister_dataitems('{1}');\n").format(SHARED_SCHEMA, self.specification.name))
+
+    def getDataitemRegisterDML(self, field):
+        
+        if field.label is not None:
+            label = field.label.replace("'","''")
+            label = "'{0}'".format(label)
+        else:
+            label = "NULL"
+
+        if field.label is not None:
+            label = field.label.replace("'","''")
+            label = "'{0}'".format(label)
+        else:
+            label = "NULL"
+
+        if field.description is not None:
+            description = field.description.replace("'","''")
+            description = "'{0}'".format(description)
+        else:
+            description = "NULL"
+
+        if field.size is None:
+            size = 'NULL'
+        else:
+            size = field.size
+
+        if field.decimalPlaces is None:
+            decimalPlaces = 'NULL'
+        else:
+            decimalPlaces = field.decimalPlaces
+            
+        if len(field.tags)>0:
+            tags="'{0}'".format(",".join(map(lambda x:"''{0}''".format(x),field.tags)))
+        else:
+            tags="NULL"
+
+        
+        return DML("SELECT {0}.register_dataitem('{1}', '{2}', {3}, '{4}', {5}, {6}, {7}, {8});\n".format(
+                            SHARED_SCHEMA, #0
+                            self.specification.name, #1 
+                            field.dataitemName, #2
+                            label, #3
+                            field.type, #4 data_type
+                            size, #5 size
+                            decimalPlaces,#6 decimal_places
+                            description, #7
+                            tags)) #8
+
 
     def getSharedSequence(self, record):
         sequenceName = "{0}_seq".format(record.table)

@@ -525,6 +525,205 @@ CREATE OR REPLACE FUNCTION shared.add_task_message
 $BODY$
 LANGUAGE 'plpgsql';
 
+-- ================
+-- Dataitem objects
+-- ================
+
+CREATE TABLE shared.dataitems (
+	name			CHARACTER VARYING(200) PRIMARY KEY,
+	label			CHARACTER VARYING(200) NOT NULL,
+	data_type CHARACTER VARYING(200) NOT NULL,
+	size INTEGER,
+	decimal_places INTEGER,
+	description		CHARACTER VARYING(200),
+	created			TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	last_modified	TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE shared.dataitem_tags (
+	dataitem_name	CHARACTER VARYING(200) NOT NULL,
+	tag				CHARACTER VARYING(200) NOT NULL,
+	created			TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT dataitem_tags_fk
+	FOREIGN KEY (dataitem_name) REFERENCES shared.dataitems(name)
+);
+
+CREATE UNIQUE INDEX dataitem_tags_idx ON shared.dataitem_tags(dataitem_name, tag);
+
+CREATE TABLE shared.dataitem_provenance (
+	dataitem_name	CHARACTER VARYING(200) NOT NULL,
+	specification	CHARACTER VARYING(200) NOT NULL,
+	CONSTRAINT dataitem_provenance_fk
+	FOREIGN KEY (dataitem_name) REFERENCES shared.dataitems(name)
+);
+
+CREATE INDEX dataitem_provenance_idx ON shared.dataitem_provenance(dataitem_name);
+CREATE INDEX dataitem_provenance_spec_idx ON shared.dataitem_provenance(specification);
+
+CREATE TABLE shared.dataitem_tag_provenance (
+	dataitem_name	CHARACTER VARYING(200) NOT NULL,
+	tag				CHARACTER VARYING(200) NOT NULL,
+	specification	CHARACTER VARYING(200) NOT NULL,	
+	CONSTRAINT dataitem_tag_provenance_fk
+	FOREIGN KEY (dataitem_name,tag) REFERENCES shared.dataitem_tags(dataitem_name,tag)
+);
+
+CREATE INDEX dataitem_tag_provenance_idx ON shared.dataitem_tag_provenance(dataitem_name, tag);
+CREATE INDEX dataitem_tag_provenance_spec_idx ON shared.dataitem_tag_provenance(specification);
+CREATE INDEX dataitem_tag_provenance_all_idx ON shared.dataitem_tag_provenance(dataitem_name, tag, specification);
+
+-- new functions
+--
+
+CREATE OR REPLACE FUNCTION shared.register_dataitem(
+	specification CHARACTER VARYING,
+	name CHARACTER VARYING,
+	label CHARACTER VARYING,
+	data_type CHARACTER VARYING,
+	size INTEGER,
+	decimal_places INTEGER,	
+	description CHARACTER VARYING,
+	tags CHARACTER VARYING)
+RETURNS VOID AS
+$BODY$
+DECLARE
+	p_spec CHARACTER VARYING;
+	p_name CHARACTER VARYING;
+	p_tags CHARACTER VARYING;
+	tag_part CHARACTER VARYING;
+	my_rec RECORD;
+	tag_array CHARACTER VARYING ARRAY;
+BEGIN
+	IF specification IS NULL THEN
+		RAISE EXCEPTION 'Specification must not be NULL';
+	END IF;
+	
+	IF name IS NULL THEN
+		RAISE EXCEPTION 'Name must not be NULL';
+	END IF;
+
+-- force all key fields to lower case
+	p_spec := lower(specification);
+	p_name := lower(name);
+
+	IF tags IS NULL THEN
+		p_tags := NULL;
+	ELSE
+		p_tags := lower(trim(tags));
+		IF length(p_tags) = 0 THEN
+			p_tags := NULL;
+		END IF;
+	END IF;
+	
+-- does item exist in dataitems?
+	SELECT * INTO my_rec FROM shared.dataitems d WHERE d.name = p_name;
+-- if no then create one
+	IF NOT FOUND THEN
+		INSERT INTO shared.dataitems (
+		  name, 
+		  label, 
+      data_type,
+	    size,
+	    decimal_places,
+		  description) 
+		VALUES (
+		  p_name, 
+		  label,
+      data_type,
+	    size,
+	    decimal_places,		   
+		  description);
+	END IF;
+
+-- create spec entry in shared.dataitem_provenance
+-- does item exist in dataitems_provenance?
+	SELECT * INTO my_rec FROM shared.dataitem_provenance p WHERE p.dataitem_name = p_name AND p.specification = p_spec;
+-- if no then create one
+	IF NOT FOUND THEN
+		INSERT INTO shared.dataitem_provenance(dataitem_name,specification) VALUES (p_name, p_spec);
+	END IF;
+
+-- proccess any tags
+	IF p_tags IS NULL THEN
+	-- do nothing
+		NULL;
+	ELSE
+		tag_array = string_to_array(p_tags, ',');
+		
+		FOR i IN 1..array_length(tag_array, 1) LOOP
+			tag_part := trim(trim(trim(tag_array[i]),''''));
+--			see if there's a tag row for this item already
+			SELECT * INTO my_rec FROM shared.dataitem_tags t WHERE t.dataitem_name = p_name AND t.tag = tag_part;
+--			if not the add it
+			IF NOT FOUND THEN
+				INSERT INTO shared.dataitem_tags (dataitem_name, tag) VALUES (p_name, tag_part);
+			END IF;
+
+--			see if there's a tag provenance row for this item already
+			SELECT * INTO my_rec FROM shared.dataitem_tag_provenance tp WHERE tp.dataitem_name = p_name AND tp.tag = tag_part AND tp.specification = p_spec;
+--			if not the add it
+			IF NOT FOUND THEN
+				INSERT INTO shared.dataitem_tag_provenance (dataitem_name, tag, specification) VALUES (p_name, tag_part, p_spec);
+			END IF;
+
+		END LOOP;
+	END IF;
+
+END
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION shared.unregister_dataitems(
+	specification CHARACTER VARYING)
+	RETURNS VOID AS
+$BODY$
+DECLARE
+	p_spec CHARACTER VARYING;
+	my_rec RECORD;
+BEGIN
+	IF specification IS NULL THEN
+		RAISE EXCEPTION 'Specification must not be NULL';
+	END IF;
+	
+	p_spec = trim(lower(specification));
+	
+-- DELETE FROM shared.dataitem_provenance
+	DELETE FROM shared.dataitem_provenance p WHERE p.specification = p_spec;
+-- DELETE FROM shared.dataitem_tag_provenance
+	DELETE FROM shared.dataitem_tag_provenance tp WHERE tp.specification = p_spec;
+	
+-- look for any rows in shared.dataitem_tags which don't have at least one
+-- spec record in shared.dataitem_tag_provenace and delete them
+	FOR my_rec IN SELECT * FROM (
+		SELECT t.dataitem_name AS dataitem_name, t.tag AS tag, p.tag AS subtag
+			FROM shared.dataitem_tags t LEFT OUTER JOIN shared.dataitem_tag_provenance p
+				on t.dataitem_name = p.dataitem_name AND t.tag = p.tag) a 
+		WHERE a.subtag IS NULL LOOP
+		DELETE FROM shared.dataitem_tags WHERE dataitem_name = my_rec.dataitem_name AND tag = my_rec.tag;
+	END LOOP;
+	
+-- look for any rows in shared.dataitems which don't have any child records in either
+-- shared.dataitem_tags or shared.dataitem_provenance and delete them
+	FOR my_rec IN SELECT * FROM (
+		SELECT d.name AS name, t.tag AS tag, s.specification as specification 
+			FROM shared.dataitems d  LEFT OUTER JOIN shared.dataitem_tags t
+			ON d.name = t.dataitem_name
+			LEFT OUTER JOIN shared.dataitem_provenance s
+			ON d.name = s.dataitem_name
+		) a WHERE a.tag IS NULL AND a.specification IS NULL LOOP
+		DELETE FROM shared.dataitems WHERE name = my_rec.name;
+	END LOOP;
+	
+END
+
+$BODY$
+LANGUAGE 'plpgsql';
+
+
+-- ==================
+-- Utility functions:
+-- ===================
+
 CREATE OR REPLACE FUNCTION shared.convert_Coordinate_to_lat_lon(p_x numeric, p_y numeric, p_srid integer) RETURNS character varying AS 
 $BODY$
   DECLARE

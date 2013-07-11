@@ -566,7 +566,7 @@ class EntityJoinRecord:
 class SpecificationRecordField:
 
     
-    def setValues(self, label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, appLogger):
+    def setValues(self, label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, dataitem, dataitemName, description, tags, appLogger):
         self.label = label
         self.column = column
         self.redirectedFromColumn = redirectedFromColumn
@@ -576,13 +576,29 @@ class SpecificationRecordField:
         self.decimalPlaces = decimalPlaces
         self.array = array
         self.default = default
+        self.dataitem = dataitem
+        self.description = description
+        self.tags = tags
+        
+        if dataitem:
+            if dataitemName is None:
+                self.dataitemName = column
+            else:
+                self.dataitemName = dataitemName
+        else:
+            self.dataitemName = None
+            
         
         if self.column is not None:
             if appLogger is not None:
-                appLogger.debug("  "+self.columnClause(None))
+                logLine = "  {0} [dataitem={1}]".format(self.columnClause(None), dataitem)
+                appLogger.debug(logLine)
         else:
             if appLogger is not None:
-                appLogger.debug("    "+cs.prettyNone(self.label)+" (not mapped to a column)")
+                logLine = "    "+cs.prettyNone(self.label)+" (not mapped to a column) [dataitem: {0}={1}]".format(self.dataitemName, self.dataitem)
+                appLogger.debug(logLine)
+                if len(self.tags) >0:
+                    appLogger.debug("      Tags: {0}".format(",".join(self.tags)))
             
         self.columnDataType=None
         self.dumpDataType=None                
@@ -635,7 +651,7 @@ class SpecificationRecordField:
             
                 
     
-    def __init__(self, fieldTag, appLogger, label=None, column=None, redirectedFromColumn=None, type=None, array=None, mandatory=None, size=None, default=None, decimalPlaces=None):
+    def __init__(self, fieldTag, appLogger, label=None, column=None, redirectedFromColumn=None, type=None, array=None, mandatory=None, size=None, default=None, decimalPlaces=None, dataitem=None, dataitemName=None, description=None, tags=None):
 
 
         if fieldTag is not None:      
@@ -674,12 +690,34 @@ class SpecificationRecordField:
             if decimalPlaces is not None:
                 decimalPlaces = int(decimalPlaces)
 
+            dataitem = cs.grabAttribute(fieldTag,"dataitem")                
+            if dataitem is None:
+                dataitem=False
+            else:
+                if dataitem=="true":
+                    dataitem=True
+                else:
+                    dataitem=False                
+
+            dataitemName = cs.grabAttribute(fieldTag,"dataitemName")
+            
+            description = cs.grabAttribute(fieldTag,"description")
+
             default = cs.grabAttribute(fieldTag,"default")
-                                                        
-            self.setValues(label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, appLogger)
+            
+            tags = []
+            tagsElement = fieldTag.getElementsByTagName("tags")                                                    
+            if len(tagsElement) >0:
+                tagsElement = tagsElement[0]
+                tagElements = tagsElement.getElementsByTagName("tag")
+                for tagElement in tagElements:
+                    tagName = cs.grabAttribute(tagElement,"name")
+                    tags.append(tagName)
+                                                                                                                    
+            self.setValues(label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, dataitem, dataitemName, description, tags, appLogger)
         
         elif column is not None:
-            self.setValues(label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, appLogger)            
+            self.setValues(label, column, redirectedFromColumn, type, mandatory, size, decimalPlaces, default, array, dataitem, dataitemName, description, tags, appLogger)            
 
 
         

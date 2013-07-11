@@ -120,7 +120,7 @@
     				event should occur.
     			</documentation>
     		</annotation>
-    	</attribute>
+    	</attribute>
     </complexType>
 
     <complexType name="stageConfigType">
@@ -265,7 +265,7 @@ Ideally there will be only one line in the whole file that matches either of the
     	<attribute name="editable" type="boolean"></attribute>
     	<attribute name="defaultVisibility" type="int"></attribute>
     	<attribute name="defaultSecurity" type="int"></attribute>
-    	<attribute name="fillFactor" type="int"></attribute>
+    	<attribute name="fillFactor" type="int"></attribute>
     </complexType>
 
     <complexType name="entityType">
@@ -352,7 +352,9 @@ Here, fields are the supplied values (as defined by the supplier of the data pro
     </complexType>
 
     <complexType name="fieldType">
-    	<sequence></sequence>
+    	<sequence>
+    		<element name="tags" type="tns:tagsType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
     	<attribute name="label" type="string"></attribute>
     	<attribute name="column" type="string"></attribute>
     	<attribute name="redirectedFromColumn" type="string"></attribute>
@@ -373,6 +375,10 @@ Here, fields are the supplied values (as defined by the supplier of the data pro
     	<attribute name="size" type="int"></attribute>
     	<attribute name="decimalPlaces" type="int"></attribute>
     	<attribute name="default" type="string"></attribute>
+    	<attribute name="dataitem" type="boolean"></attribute>
+
+    	<attribute name="dataitemName" type="string"></attribute>
+    	<attribute name="description" type="string"></attribute>
     </complexType>
 
     <complexType name="additionalFieldsType">
@@ -1676,5 +1682,17 @@ LEAST visablity and GREATEST security values will also be generated automaticall
     
     <complexType name="mvAlertsType">
     	<attribute name="enabled" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="tagsType">
+    	<sequence>
+    		<element name="tag" type="tns:tagType" maxOccurs="unbounded"
+    			minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="tagType">
+    	<attribute name="name" type="string"></attribute>
     </complexType>
 </schema>

@@ -653,6 +653,10 @@ def makePostgreSQLBuildScript(settings, version):
             
             registerAndWrite(sharedSequence, objectRegistry, file)
             registerAndWrite(sharedNextIdFunction, objectRegistry, file)
+            
+            for field in record.fields:
+                if field.dataitem:
+                    registerAndWrite(sqlBuilder.getDataitemRegisterDML(field), objectRegistry, file)
 
 
     def buildWorkingSchema():
