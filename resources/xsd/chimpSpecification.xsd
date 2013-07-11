@@ -118,7 +118,7 @@
     				event should occur.
     			</documentation>
     		</annotation>
-    	</attribute>
+    	</attribute>
     </complexType>
 
     <complexType name="stageConfigType">
@@ -263,7 +263,7 @@ Ideally there will be only one line in the whole file that matches either of the
     	<attribute name="editable" type="boolean"></attribute>
     	<attribute name="defaultVisibility" type="int"></attribute>
     	<attribute name="defaultSecurity" type="int"></attribute>
-    	<attribute name="fillFactor" type="int"></attribute>
+    	<attribute name="fillFactor" type="int"></attribute>
     </complexType>
 
     <complexType name="entityType">
