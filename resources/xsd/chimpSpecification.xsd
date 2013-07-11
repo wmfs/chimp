@@ -2,8 +2,6 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.wmfs.net/chimp" xmlns:tns="http://www.wmfs.net/chimp" elementFormDefault="qualified">
 
 
-
-
     <element name="specification" type="tns:specificationType"></element>
     
 
