@@ -656,7 +656,8 @@ def makePostgreSQLBuildScript(settings, version):
             
             for field in record.fields:
                 if field.dataitem:
-                    registerAndWrite(sqlBuilder.getDataitemRegisterDML(field), objectRegistry, file)
+                    
+                    registerAndWrite(sqlBuilder.getDataitemRegisterDML(record, field), objectRegistry, file)
 
 
     def buildWorkingSchema():

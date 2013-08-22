@@ -61,7 +61,7 @@ class SpecificationSQLBuilder:
                    dropDdl=("SELECT {0}.unregister_specification('{1}');\n"
                             "SELECT {0}.unregister_dataitems('{1}');\n").format(SHARED_SCHEMA, self.specification.name))
 
-    def getDataitemRegisterDML(self, field):
+    def getDataitemRegisterDML(self, record, field):
         
         if field.label is not None:
             label = field.label.replace("'","''")
@@ -96,17 +96,24 @@ class SpecificationSQLBuilder:
         else:
             tags="NULL"
 
+        if record.editable:
+            editable = "true"
+        else:
+            editable = "false"
         
-        return DML("SELECT {0}.register_dataitem('{1}', '{2}', {3}, '{4}', {5}, {6}, {7}, {8});\n".format(
+        return DML("SELECT {0}.register_dataitem('{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', {8}, {9}, {10}, {11});\n".format(
                             SHARED_SCHEMA, #0
                             self.specification.name, #1 
                             field.dataitemName, #2
-                            label, #3
-                            field.type, #4 data_type
-                            size, #5 size
-                            decimalPlaces,#6 decimal_places
-                            description, #7
-                            tags)) #8
+                            record.table, #3
+                            field.column, #4
+                            editable, #5
+                            label, #6
+                            field.type, #7 data_type
+                            size, #8 size
+                            decimalPlaces,#9 decimal_places
+                            description, #10
+                            tags)) #11
 
 
     def getSharedSequence(self, record):
