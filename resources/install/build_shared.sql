@@ -1231,6 +1231,60 @@ $BODY$
   LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION shared.batch_cutter(p_target_table character varying, p_pk_column character varying, p_order_by character varying, p_batch_column character varying, p_max_batch_id integer)
+  RETURNS void AS
+$BODY$
+  DECLARE
+    v_sql character varying;
+    v_count integer;
+    v_record record;
+    v_update character varying;
+    v_batch int;
+    v_batch_size numeric;
+    i integer;
+    
+  BEGIN
+
+    -- Function to chunk a table into numbered batches... 
+    -- for the purposes of splitting work into groups for manual data processing/reviewing apps.
+    
+    v_sql := 'SELECT count(*) FROM '||p_target_table;
+    EXECUTE v_sql
+    INTO v_count
+    USING p_target_table;
+    RAISE NOTICE 'ROW COUNT: %', v_count;
+
+
+    v_batch_size = CEIL(v_count::numeric/p_max_batch_id::numeric);
+    RAISE NOTICE 'BATCH SIZE: %', v_batch_size;
+
+    v_sql := 'SELECT DISTINCT '||p_pk_column||' AS pk FROM '||p_target_table||' ORDER BY '||p_order_by;
+    v_update := 'UPDATE ' || p_target_table || ' SET '||p_batch_column||'=$1 WHERE ' ||p_pk_column|| '=$2';
+    v_batch = 1;
+
+    i = 0;
+    FOR v_record IN EXECUTE v_sql LOOP
+      RAISE NOTICE '%', v_record.pk;
+
+      EXECUTE v_update
+      USING v_batch, v_record.pk;
+
+      i = i + 1;
+      IF i = v_batch_size THEN
+        i = 0;
+        IF v_batch < p_max_batch_id THEN
+          v_batch := v_batch + 1;
+        END IF;
+      END IF;
+        
+      
+    END LOOP;
+    
+  END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -- 
 -- $Id: cleanGeometry.sql 2008-04-24 10:30Z Dr. Horst Duester $
