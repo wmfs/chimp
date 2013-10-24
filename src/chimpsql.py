@@ -552,7 +552,16 @@ class SpecificationSQLBuilder:
         def getWhere(prefix):
             joins = []
             for join in table.joins:
-                joins.append("{0} = {1}.{2}".format(join.foreignColumn, prefix, join.column))
+
+                # Is viewColumn aliased? if so replace alias here.
+                viewColumn = join.foreignColumn
+                for t in entity.tables:
+                    if t.name == table.name:
+                        for c in t.columns:
+                            if c.column == join.foreignColumn:
+                                viewColumn = c.finalEntityColumn                    
+                
+                joins.append("{0} = {1}.{2}".format(viewColumn, prefix, join.column))
             return(" AND ".join(joins))
 
         
@@ -590,12 +599,21 @@ class SpecificationSQLBuilder:
     
     # AFTER UPDATE
     def getMVEntityUpdateTriggerFunction(self, table, entity, mvTable, refreshRowFunction, schemaName):
-        def getWhere(prefix):
-            joins = []                    
-            for join in table.joins:           
-                joins.append("{0} = {1}.{2}".format(join.finalForeignColumn, prefix, join.column))
-            return(" AND ".join(joins))
 
+        def getWhere(prefix):
+            joins = []
+            for join in table.joins:
+
+                # Is viewColumn aliased? if so replace alias here.
+                viewColumn = join.foreignColumn
+                for t in entity.tables:
+                    if t.name == table.name:
+                        for c in t.columns:
+                            if c.column == join.foreignColumn:
+                                viewColumn = c.finalEntityColumn                    
+                
+                joins.append("{0} = {1}.{2}".format(viewColumn, prefix, join.column))
+            return(" AND ".join(joins))
 
         def getJoinChangeCondition():
             joins = []                    
