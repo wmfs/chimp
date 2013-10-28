@@ -169,7 +169,7 @@ CREATE TABLE shared.current_tasks
    audit_operating_system character varying(200),
    audit_operating_system_release character varying(200),
    audit_username character varying(200),
-   args character varying(4000),
+   args character varying,
    worth_logging boolean not null,
    CHECK (state IN('pending','scanning','scanned', 'paused','finished','failed','processing')));
  
@@ -332,7 +332,7 @@ CREATE TABLE shared.finished_tasks
    audit_operating_system character varying(200),
    audit_operating_system_release character varying(200),
    audit_username character varying(200),
-   args character varying(2000));
+   args character varying);
 
 CREATE INDEX started_idx ON shared.finished_tasks(started);
 
