@@ -976,6 +976,23 @@ BEGIN
   RETURN |/(w*w+h*h);
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION shared.get_average_distance(p_x numeric, p_y numeric, p_table_name character varying, p_column character varying, p_average_count integer, p_srid integer) RETURNS integer AS
+$BODY$
+DECLARE
+  v_avg_distance integer;
+  v_sql character varying; 
+BEGIN
+  v_sql = 'SELECT floor(avg(distance)) avg_distance '||
+  'FROM (SELECT floor(ST_Distance(ST_GeomFromText(''POINT('||p_x::character varying||' '||p_y::character varying||')'','||p_srid::character varying||'), '||p_column||')) as distance '||
+  'FROM '||p_table_name||' order by 1 asc limit '||p_average_count::character varying||') as top_3;';
+  EXECUTE v_sql
+  INTO v_avg_distance;
+  RETURN v_avg_distance;
+END;
+$BODY$
+LANGUAGE plpgsql;
   
 CREATE OR REPLACE FUNCTION shared.make_sql_statement(p_select_clause character varying, p_from_clause character varying, p_filter_restrictions character varying[], p_order_by_clause character varying) RETURNS CHARACTER VARYING AS $$
 DECLARE
