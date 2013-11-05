@@ -993,6 +993,20 @@ BEGIN
 END;
 $BODY$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION shared.convert_metres_to_miles(p_metres numeric) RETURNS numeric AS
+$BODY$
+ DECLARE
+   r numeric;
+ BEGIN
+	IF p_metres IS NOT NULL THEN
+	  r := round(p_metres/1609.344::numeric, 1);
+	END IF;
+	RETURN r;
+ END;
+$BODY$
+LANGUAGE 'plpgsql';
+ 
   
 CREATE OR REPLACE FUNCTION shared.make_sql_statement(p_select_clause character varying, p_from_clause character varying, p_filter_restrictions character varying[], p_order_by_clause character varying) RETURNS CHARACTER VARYING AS $$
 DECLARE
