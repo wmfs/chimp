@@ -569,14 +569,14 @@ class SpecificationSQLBuilder:
                 
         if table.joinType is None:                
             body = ("    -- This is the 'lead' table\n"
-                    "    PERFORM {0}.refresh_{1}_row (new.id, True);\n").format(MV_SCHEMA, entity.name)
+                    "    PERFORM {0}.refresh_{1}_row (new.id, False);\n").format(MV_SCHEMA, entity.name)
         else:
             if table.joinType=="inner":
                 body  = "    -- This table is inner-joined\n"
             elif table.joinType=="left":
                 body  = "    -- This table is left joined\n"
                 
-            body += ("    PERFORM {0}.refresh_{1}_row (a.{2}_id, False)\n"
+            body += ("    PERFORM {0}.refresh_{1}_row (a.{2}_id, True)\n"
                      "    FROM {0}.{1}_unmaterialized AS a\n"
                      "    WHERE {3};\n\n").format(MV_SCHEMA, entity.name, entity.tables[0].name, getWhere("new"))
                                                                                     
