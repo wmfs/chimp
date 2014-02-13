@@ -212,6 +212,12 @@ def makePostgreSQLBuildScript(settings, version):
                 registerAndWrite(mvEntityUpdateTriggerFunction, objectRegistry, file)                                       
                 registerAndWrite(sqlBuilder.getMVEntityUpdateTrigger(specification, table, entity, schemaName, mvEntityUpdateTriggerFunction), objectRegistry, file)
 
+                mvEntityDeleteTriggerFunction = sqlBuilder.getMVEntityDeleteTriggerFunction(table, entity, mvTable, mvRefreshRowFunction, schemaName)
+                registerAndWrite(mvEntityDeleteTriggerFunction, objectRegistry, file)                                       
+                registerAndWrite(sqlBuilder.getMVEntityDeleteTrigger(table, entity, schemaName, mvEntityDeleteTriggerFunction), objectRegistry, file)
+
+
+
             
             enableTriggersFilename = os.path.join(settings.paths["generatedMVSQLScriptsDir"].format(specification.name), "{0}_enable.sql".format(entity.name))
             with open(enableTriggersFilename, "w") as mvFile:

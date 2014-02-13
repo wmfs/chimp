@@ -677,7 +677,69 @@ class SpecificationSQLBuilder:
                                      triggerFunction.schema, triggerFunction.name))
     
 
+    # AFTER DELETE
+    def getMVEntityDeleteTriggerFunction(self, table, entity, mvTable, refreshRowFunction, schemaName):
+
+        def getWhere(prefix):
+            joins = []
+            for join in table.joins:
+
+                # Is viewColumn aliased? if so replace alias here.
+                viewColumn = join.foreignColumn
+                for t in entity.tables:
+                    if t.name == table.name:
+                        for c in t.columns:
+                            if c.column == join.foreignColumn:
+                                viewColumn = c.finalEntityColumn                    
+                
+                joins.append("{0} = {1}.{2}".format(viewColumn, prefix, join.column))
+            return(" AND ".join(joins))
+
+        
+        functionName = "delete_of_{0}_by_{1}".format(entity.name, table.name)
+                
+        if table.joinType is None:                
+            body = ("    -- This is the 'lead' table\n"
+                    "    PERFORM {0}.refresh_{1}_row (old.id, True);\n").format(MV_SCHEMA, entity.name)
+        else:
+            if table.joinType=="inner":
+                body  = "    -- This table is inner-joined\n"
+            elif table.joinType=="left":
+                body  = "    -- This table is left joined\n"
+                
+            body += ("    PERFORM {0}.refresh_{1}_row (a.{2}_id, True)\n"
+                     "    FROM {0}.{1}_unmaterialized AS a\n"
+                     "    WHERE {3};\n\n").format(MV_SCHEMA, entity.name, entity.tables[0].name, getWhere("old"))
+                                                                                    
+        return Function(functionName, MV_SCHEMA, [],
+                        ("CREATE OR REPLACE FUNCTION {0}.{1}() RETURNS trigger AS $$\n"
+                         "  BEGIN\n{2}"  
+                         "    RETURN null;\n"                
+                         "  END;\n"
+                         "$$ LANGUAGE plpgsql;\n\n").format(MV_SCHEMA, functionName, body))
     
+
+#     def getMVEntityDeleteTrigger(self, table, entity, schemaName, triggerFunction):
+#         storageTableName = table.name
+#         triggerName = "c_mv_delete_of_{0}_by_{1}".format(entity.name, table.name)
+#                     
+#         return Trigger(triggerName, storageTableName, triggerFunction.name, schemaName, 
+#                        ("CREATE TRIGGER {0} AFTER DELETE ON {1}.{2}\n"
+#                         "  FOR EACH ROW EXECUTE PROCEDURE {3}.{4}();\n\n").format(triggerName, schemaName, storageTableName, triggerFunction.schema, triggerFunction.name))
+# 
+#     
+    
+    
+    def getMVEntityDeleteTrigger(self, table, entity, schemaName, triggerFunction):
+        storageTableName = table.name
+        triggerName = "c_mv_delete_of_{0}_by_{1}".format(entity.name, table.name)
+        triggeringColumns = ["visibility", "security"]
+
+        
+        return Trigger(triggerName, storageTableName, triggerFunction.name, schemaName, 
+                       ("CREATE TRIGGER {0} AFTER DELETE ON {1}.{2}\n"
+                        "  FOR EACH ROW EXECUTE PROCEDURE {3}.{4}();\n\n").format(triggerName, schemaName, storageTableName, triggerFunction.schema, triggerFunction.name))
+ 
     
     def getMVEnableTriggersDDL(self, entity, schemaName):
         return self._getMVSetTriggersEnabledDDL(entity, schemaName, True)
@@ -692,7 +754,8 @@ class SpecificationSQLBuilder:
         for table in entity.tables:
             # lines.append("ALTER TABLE {0}.{1} {2} TRIGGER b_{1}_mv_{3}_update;\n".format(schemaName, table.name, enable, entity.name))
             lines.append("ALTER TABLE {0}.{1} {2} TRIGGER c_mv_insert_of_{3}_by_{1};\n".format(schemaName, table.name, enable, entity.name))
-            lines.append("ALTER TABLE {0}.{1} {2} TRIGGER c_mv_update_of_{3}_by_{1};\n".format(schemaName, table.name, enable, entity.name, table.name))
+            lines.append("ALTER TABLE {0}.{1} {2} TRIGGER c_mv_update_of_{3}_by_{1};\n".format(schemaName, table.name, enable, entity.name))
+            lines.append("ALTER TABLE {0}.{1} {2} TRIGGER c_mv_delete_of_{3}_by_{1};\n".format(schemaName, table.name, enable, entity.name))
         
 #        for thisFindRecord in self.specification.records:
 #            for thisAction in thisFindRecord.mvModifyingActions:
