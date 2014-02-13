@@ -9,10 +9,13 @@ def queueTasks(queuer, settings, schemaRestriction, stream, specificationRestric
 
     if specificationRestriction is not None:
         sql += "specification_name in({0}) and ".format(specificationRestriction)
+        
     sql += " source_schema=%s"
     queuer.supportCursor.execute(sql, (schemaRestriction,))
     specificationCtrees = queuer.supportCursor.fetchall()
-           
+     
+    appLogger.debug("  sql: {0}".format(sql));
+    
     for ctree in specificationCtrees:
         
     
