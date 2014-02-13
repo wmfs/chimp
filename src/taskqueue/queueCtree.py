@@ -15,6 +15,7 @@ def queueTasks(queuer, settings, schemaRestriction, stream, specificationRestric
     specificationCtrees = queuer.supportCursor.fetchall()
      
     appLogger.debug("  sql: {0}".format(sql));
+    appLogger.debug("       {0}".format(schemaRestriction));
     
     for ctree in specificationCtrees:
         
