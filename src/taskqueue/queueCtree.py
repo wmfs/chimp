@@ -8,14 +8,18 @@ def queueTasks(queuer, settings, schemaRestriction, stream, specificationRestric
     sql = "select specification_name,source_schema,source_name,ancestor_column_name,descendant_column_name,column_suffix,depth_column_name,immediate_ancestor_column_name,root_ancestor_column_name,descendant_count_column from calc.ctree_registry where "
 
     if specificationRestriction is not None:
-        sql += "specification_name in({0}) and ".format(specificationRestriction)
+        sql += "specification_name in({0})".format(specificationRestriction)
+
+    if schemaRestriction is not None:
+        if specificationRestriction is not None:
+            sql += ' and '
+        sql += " source_schema='{0}'".format(schemaRestriction)
         
-    sql += " source_schema=%s"
-    queuer.supportCursor.execute(sql, (schemaRestriction,))
+    queuer.supportCursor.execute(sql)
     specificationCtrees = queuer.supportCursor.fetchall()
      
     appLogger.debug("  sql: {0}".format(sql));
-    appLogger.debug("       {0}".format(schemaRestriction));
+    appLogger.debug("  schemaRestriction: {0}".format(schemaRestriction));
     
     for ctree in specificationCtrees:
         

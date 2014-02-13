@@ -80,7 +80,7 @@ class Queuer:
 
         if processCtree:
             import taskqueue.queueCtree as queueCtree
-            queueCtree.queueTasks(self, self.settings, "mv", stream, specificationRestriction, groupId, appLogger) 
+            queueCtree.queueTasks(self, self.settings, None, stream, specificationRestriction, groupId, appLogger) 
 
         if processPins:
             import taskqueue.queuePins as queuePins
