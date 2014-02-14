@@ -189,8 +189,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
     customList = args["customList"] 
     flushQueue = args["flushQueue"]
             
-    appLogger.info("")
-    appLogger.info("  {0}.{1}:".format(inputSourceSchema,inputSourceName))
+    appLogger.info("  |{0}.{1}:".format(inputSourceSchema,inputSourceName))
     
     customColumnResults=[]
     calculatorCache={}
