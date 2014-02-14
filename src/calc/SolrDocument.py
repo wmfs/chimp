@@ -403,51 +403,68 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
         if lineCount % commitThreshold == 0:
             appLogger.debug("| << Transaction size threshold reached ({0}): COMMIT >>".format(lineCount))
             dataConnection.connection.commit()
-        solrDocument = conversionFunction(supportCursor, record)        
-        dataCursor.execute(applySql, solrDocument)
-        
 
-        
-        messages = dataCursor.fetchall()
-        messagesFound = False
-        raisedWarning = False
-        raisedError = False                
-        raisedException=False
-        
-        for thisMessage in messages:
-            messagesFound = True
-            messageLevel = thisMessage[0]
-            messageCode = thisMessage[1]
-            messageTitle = thisMessage[2]
-            messageAffectedColumns = thisMessage[3]
-            messageAffectedRowCount = thisMessage[4]
-            messageContent = "{0}\n\nDocument data being applied:\n{1}".format(thisMessage[5], solrDocument)
-            supportCursor.execute(messageSql, (taskId, None, lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent))
-
-            if messageLevel=="warning":
-                raisedWarning = True
-            elif messageLevel=="error":
-                raisedError = True
-            elif messageLevel=="exception":
-                raisedException = True     
-            elif messageLevel=="notice":
-                noticeCount = noticeCount + 1
-
-        if messagesFound:
-            if raisedException:
-                exceptionCount = exceptionCount +1
-            elif raisedError:
-                errorCount = errorCount +1
-            elif raisedWarning:
-                warningCount = warningCount +1
-            else:
+        try:
+            solrDocument = None
+            solrDocument = conversionFunction(supportCursor, record)        
+            dataCursor.execute(applySql, solrDocument)
+            
+    
+            
+            messages = dataCursor.fetchall()
+            messagesFound = False
+            raisedWarning = False
+            raisedError = False                
+            raisedException=False
+            
+            for thisMessage in messages:
+                messagesFound = True
+                messageLevel = thisMessage[0]
+                messageCode = thisMessage[1]
+                messageTitle = thisMessage[2]
+                messageAffectedColumns = thisMessage[3]
+                messageAffectedRowCount = thisMessage[4]
+                messageContent = "{0}\n\nDocument data being applied:\n{1}".format(thisMessage[5], solrDocument)
+                supportCursor.execute(messageSql, (taskId, None, lineCount, messageLevel,  messageCode, messageTitle,  messageAffectedColumns, messageAffectedRowCount, messageContent))
+    
+                if messageLevel=="warning":
+                    raisedWarning = True
+                elif messageLevel=="error":
+                    raisedError = True
+                elif messageLevel=="exception":
+                    raisedException = True     
+                elif messageLevel=="notice":
+                    noticeCount = noticeCount + 1
+    
+            if messagesFound:
+                if raisedException:
+                    exceptionCount = exceptionCount +1
+                elif raisedError:
+                    errorCount = errorCount +1
+                elif raisedWarning:
+                    warningCount = warningCount +1
+                else:
+                    successCount = successCount+1
+            else:                                                                                    
                 successCount = successCount+1
-        else:                                                                                    
-            successCount = successCount+1
-    
+       
+        except Exception as detail:
+            exceptionCount = exceptionCount + 1            
+            if exceptionCount < 4:
+                print('Error processing Solr document (see logs)')
+                appLogger.error(" |   EXCEPTION PROCESSING SOLR DOCUMENT")
+                appLogger.error(" |     {0}".format(str(detail)))
+                appLogger.error(" |     Record: {0}".format(record))
+                appLogger.error(" |     SolrDocument: {0}".format(solrDocument))
+            self.queue.addTaskMessage(taskId, None, i, "exception", "EXP", "Exception processing SolrDocument", None, 1, "ERROR: {0} RECORD: {1}".format(detail, record))
+
     loopCursor.close()
+
+    if (exceptionCount > 0 or errorCount > 0):
+        dataConnection.connection.rollback()
+    else:      
+        dataCursor.execute(truncateDml)
     
-    dataCursor.execute(truncateDml)
     
     queue.finishTask(taskId, successCount, exceptionCount, errorCount, warningCount, noticeCount, ignoredCount)        
     return( (successCount, exceptionCount, errorCount, warningCount, ignoredCount, noticeCount) )
