@@ -182,9 +182,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
     appLogger = settings.appLogger
     commitThreshold = int(settings.env["dataCommitThreshold"])
     
-    appLogger.info("")
-    appLogger.info("processSynchronizeCustomColumns")
-    appLogger.info("-------------------------------")
+    appLogger.info("  |")
 
     inputSourceSchema = args["inputSourceSchema"]
     inputSourceName = args["inputSourceName"]
@@ -196,20 +194,20 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
     
     customColumnResults=[]
     calculatorCache={}
-    appLogger.info("  Column list:")
+    appLogger.info("  |  Column list:")
     for custom in customList:    
-        appLogger.debug("    {0}".format(custom))
+        appLogger.info("  |    {0}".format(custom))
         calculatorCache[custom]=getattr(processor, "custom_{0}_calculator".format(custom))
         
     
     # Publish how many rows containing custom-content we're talking about
     queue.startTask(taskId, True)
     sql = "select count(*) from {0}.{1}_custom_queue".format(CALC_SCHEMA, inputSourceName)
+    appLogger.info("  |    sql: {0}".format(sql))
     supportCursor.execute(sql)
     customCount = supportCursor.fetchone()[0]
     queue.setScanResults(taskId, customCount)
-    appLogger.info("  customCount        : {0}".format(customCount))
-#   appLogger.info("")
+    appLogger.info("  |    customCount        : {0}".format(customCount))
 
     # Construct update statement
     setClause= ", ".join(map(lambda field: "{0}=%s".format(field), customList)) 
@@ -225,9 +223,9 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
     loopCursor = loopConnection.makeCursor("custom", True, True)
     loopCursor.execute(loopSql)
 
-    appLogger.info("  loopSql   : {0}".format(loopSql))
-    appLogger.info("  updateDml : {0}".format(updateDml))
-    appLogger.info("  deleteDml : flushQueue={1} - {0}".format(flushQueue, deleteFromQueue))
+    appLogger.info("  |    loopSql   : {0}".format(loopSql))
+    appLogger.info("  |    updateDml : {0}".format(updateDml))
+    appLogger.info("  |    deleteDml : flushQueue={1} - {0}".format(flushQueue, deleteFromQueue))
     recordCount=0
 
     for record in loopCursor:   
@@ -235,7 +233,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
         if recordCount%1000 ==0:
             queue.setTaskProgress(taskId, recordCount, 0, 0, 0, 0, 0)
         if recordCount % commitThreshold == 0:
-            appLogger.debug("| << Transaction size threshold reached ({0}): COMMIT >>".format(recordCount))
+            appLogger.debug("  |    << Transaction size threshold reached ({0}): COMMIT >>".format(recordCount))
             dataConnection.connection.commit()
                         
         params=[]
@@ -244,6 +242,9 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
         
         id = record["id"]
         params.append(id)
+        
+        if recordCount < 11:
+            appLogger.info('  |   [{0}] = Params: {1}'.format(recordId, params))
 
         dataCursor.execute(updateDml, tuple(params))
         if flushQueue:
