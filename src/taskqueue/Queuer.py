@@ -69,18 +69,18 @@ class Queuer:
         appLogger.debug("  stream                   : {0}".format(stream))
         appLogger.debug("  specificationRestriction : {0}".format(specificationRestriction))
         appLogger.debug("  Restriction:")
-        appLogger.debug("    processCustomColumns : {0}".format(processCustomColumns))
         appLogger.debug("    processCtree         : {0}".format(processCtree))
+        appLogger.debug("    processCustomColumns : {0}".format(processCustomColumns))
         appLogger.debug("    processPins          : {0}".format(processPins))
         appLogger.debug("    processSolrDocuments : {0}".format(processSolrDocuments))
-
-        if processCustomColumns:
-            import taskqueue.queueCustom as queueCustom
-            queueCustom.queueTasks(self, self.settings, stream, specificationRestriction, groupId, appLogger) 
 
         if processCtree:
             import taskqueue.queueCtree as queueCtree
             queueCtree.queueTasks(self, self.settings, None, stream, specificationRestriction, groupId, appLogger) 
+
+        if processCustomColumns:
+            import taskqueue.queueCustom as queueCustom
+            queueCustom.queueTasks(self, self.settings, stream, specificationRestriction, groupId, appLogger) 
 
         if processPins:
             import taskqueue.queuePins as queuePins
