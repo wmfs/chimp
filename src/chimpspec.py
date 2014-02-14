@@ -206,7 +206,7 @@ class EntityRecord:
                     if includeComputedFields:
                         allFields.extend(thisRecord.computedData.getAllFields())
             
-        if includeComputedFields:
+        if includeComputedFields and tableRestriction is None:
             allFields.extend(self.computedData.getAllFields())
                         
         return(allFields)

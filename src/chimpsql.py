@@ -658,7 +658,8 @@ class SpecificationSQLBuilder:
         #for join in table.joins:
         #    triggeringColumns.append(join.column)
                 
-        allTriggeringFields = entity.getAllFields(specificationName, None, False, None, table.name, returnSourceColumnName=True)
+        allTriggeringFields = entity.getAllFields(specificationName, None, True, None, table.name, returnSourceColumnName=True)
+        
         for field in allTriggeringFields:
             triggeringColumns.append(field.column)
 
