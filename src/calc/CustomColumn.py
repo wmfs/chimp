@@ -244,7 +244,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
         params.append(id)
         
         if recordCount < 11:
-            appLogger.info('  |   [{0}] = Params: {1}'.format(recordId, params))
+            appLogger.info('  |   [{0}] = Params: {1}'.format(id, params))
 
         dataCursor.execute(updateDml, tuple(params))
         if flushQueue:
