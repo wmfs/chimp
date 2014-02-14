@@ -456,7 +456,7 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
                 appLogger.error(" |     {0}".format(str(detail)))
                 appLogger.error(" |     Record: {0}".format(record))
                 appLogger.error(" |     SolrDocument: {0}".format(solrDocument))
-            self.queue.addTaskMessage(taskId, None, i, "exception", "EXP", "Exception processing SolrDocument", None, 1, "ERROR: {0} RECORD: {1}".format(detail, record))
+            queue.addTaskMessage(taskId, None, i, "exception", "EXP", "Exception processing SolrDocument", None, 1, "ERROR: {0} RECORD: {1}".format(detail, record))
 
     loopCursor.close()
 
