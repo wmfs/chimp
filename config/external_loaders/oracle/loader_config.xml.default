@@ -1,0 +1,7 @@
+<loaderConfig>
+  <registry>
+ 	<key name="currentWorkingDirectory" value="/chimp/chimp/config/external_loaders/oracle"/>
+	<key name="commandName" value="java"/>
+  </registry>
+</loaderConfig>
+	
