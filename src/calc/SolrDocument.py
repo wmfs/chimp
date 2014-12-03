@@ -453,6 +453,7 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
             if exceptionCount < 4:
                 print('Error processing Solr document (see logs)')
                 appLogger.error(" |   EXCEPTION PROCESSING SOLR DOCUMENT")
+                appLogger.error(" |     ApplySql: {0}".format(applySql))
                 appLogger.error(" |     {0}".format(str(detail)))
                 appLogger.error(" |     Record: {0}".format(record))
                 appLogger.error(" |     SolrDocument: {0}".format(solrDocument))
