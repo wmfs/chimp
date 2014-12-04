@@ -452,11 +452,14 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
             exceptionCount = exceptionCount + 1            
             if exceptionCount < 4:
                 print('Error processing Solr document (see logs)')
+                appLogger.error(" |")
                 appLogger.error(" |   EXCEPTION PROCESSING SOLR DOCUMENT")
+                appLogger.error(" |     Filename: {0} ({1})".format(filename, moduleToUse))
                 appLogger.error(" |     ApplySql: {0}".format(applySql))
                 appLogger.error(" |     {0}".format(str(detail)))
                 appLogger.error(" |     Record: {0}".format(record))
                 appLogger.error(" |     SolrDocument: {0}".format(solrDocument))
+                appLogger.error(" |")                
             queue.addTaskMessage(taskId, None, i, "exception", "EXP", "Exception processing SolrDocument", None, 1, "ERROR: {0} RECORD: {1}".format(detail, record))
 
     loopCursor.close()
