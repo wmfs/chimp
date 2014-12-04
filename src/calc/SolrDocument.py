@@ -396,7 +396,9 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
     # Truncate table
     truncateDml = "delete from {0}.{1}_solr_document_queue".format(CALC_SCHEMA, documentName)
     appLogger.info(" |   truncateDml : {0}".format(truncateDml))
+    
     for record in loopCursor:
+        
         if lineCount%1000 ==0:
             queue.setTaskProgress(taskId, successCount, 0, 0, 0, 0, 0)
         lineCount=lineCount+1

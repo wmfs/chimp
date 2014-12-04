@@ -224,7 +224,7 @@ def processSynchronizeCustomColumn(queue, supportConnection, supportCursor, loop
 
     appLogger.info("  |    loopSql   : {0}".format(loopSql))
     appLogger.info("  |    updateDml : {0}".format(updateDml))
-    appLogger.info("  |    deleteDml : flushQueue={1} - {0}".format(flushQueue, deleteFromQueue))
+    appLogger.info("  |    deleteDml : {0} - flushQueue={1}".format(deleteFromQueue, flushQueue))
     recordCount=0
 
     for record in loopCursor:   
