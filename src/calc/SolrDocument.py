@@ -455,6 +455,7 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
                 appLogger.error(" |")
                 appLogger.error(" |   EXCEPTION PROCESSING SOLR DOCUMENT")
                 appLogger.error(" |     Filename: {0} ({1})".format(filename, moduleToUse))
+                appLogger.error(" |     ConversionFunction: {0}".format(conversionFunction))
                 appLogger.error(" |     ApplySql: {0}".format(applySql))
                 appLogger.error(" |     {0}".format(str(detail)))
                 appLogger.error(" |     Record: {0}".format(record))
