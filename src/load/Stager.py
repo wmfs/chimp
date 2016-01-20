@@ -302,8 +302,11 @@ class Stager:
                     
             #http://docs.python.org/library/time.html
         if nativeDataType == "date":
-            dt = datetime.datetime.strptime(rawValue.strip(), dateFormat)
-            nativeFieldValue = datetime.date(dt.year,dt.month,dt.day)
+            if rawValue is not None:
+                dt = datetime.datetime.strptime(rawValue.strip(), dateFormat)
+                nativeFieldValue = datetime.date(dt.year,dt.month,dt.day)
+            else:
+                nativeFieldValue = None;
     
         if nativeDataType == "time":
             dt = datetime.datetime.strptime(rawValue.strip(), timeFormat)
