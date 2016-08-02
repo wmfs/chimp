@@ -375,20 +375,42 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
     appLogger.info(" |   documentsExist: {0}".format(documentsExist))
 
 
+    
+
     # Apply 
     applySql = "select * from {0}.apply_{1}(".format(SOLR_SCHEMA, serverName)
     i=0
     while i<fieldCount:
         applySql += "%s,"
         i += 1
-    if documentsExist:
-        applySql += "true)"
-    else:
-        applySql += "false)"
+    # if documentsExist:
+    #    applySql += "true)"
+    #else:
+    #    applySql += "false)"
+     
+    applySql += "false)" 
+        
+    appLogger.info(" |   applySql : {0}".format(applySql))   
 
     # Establish main loop
     loopSql = "select * from {1}.{2}_solr_document_queue_view as a".format(None, CALC_SCHEMA, documentName)
     appLogger.info(" |   loopSql    : {0}".format(loopSql))   
+    
+    
+    # Flushing
+    if documentsExist:
+        loopCursor = loopConnection.makeCursor("solrFlush", True, True)
+        loopCursor.execute(loopSql)
+        appLogger.info(" |   Flushing:")
+        flushDml = "delete from {0}.{1} where document_type=%s and document_key=%s".format(SOLR_SCHEMA, serverName);
+        appLogger.info(" |       flushDml: {0}".format(flushDml))
+        for record in loopCursor:
+            solrDocument = None
+            solrDocument = conversionFunction(supportCursor, record)    
+            appLogger.info(" |  {0}".format(solrDocument[2]));
+            dataCursor.execute(flushDml, (documentName, solrDocument[2]))
+        loopCursor.close()
+    
     loopCursor = loopConnection.makeCursor("solr", True, True)
     loopCursor.execute(loopSql)
     lineCount=0
@@ -475,5 +497,3 @@ def processSolrDocuments(queue, supportConnection, supportCursor, loopConnection
     
     queue.finishTask(taskId, successCount, exceptionCount, errorCount, warningCount, noticeCount, ignoredCount)        
     return( (successCount, exceptionCount, errorCount, warningCount, ignoredCount, noticeCount) )
-
-
