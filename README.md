@@ -1,8 +1,6 @@
 # Chimp
 
-> A dynamic PostgreSQL database generator, and integrated extract, transform and load tool.
-
-Licensed under the GNU General Public License v3. See LICENCE.txt for details.
+> An [award-winning](https://github.com/wmfs/chimp/wiki/Chimp-in-the-news), dynamic PostgreSQL database generator written in Python... with integrated extract, transform and load capabilities.
 
 # Environment
 
